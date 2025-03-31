@@ -1,0 +1,213 @@
+<div class="form-container">
+    <h1>AFILIACIÓN</h1>
+
+    <form [formGroup]="afiliacionForm" (ngSubmit)="onSubmit()" class="form-content">
+        <div class="cards-grid">
+            <div class="card-row">
+                <mat-card class="compact-card">
+                    <mat-card-header>
+                        <h2>Datos generales</h2>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Razón Social</mat-label>
+                            <input matInput formControlName="razonSocial" required>
+                            <mat-error *ngIf="afiliacionForm.get('razonSocial')?.hasError('required')">
+                                Este campo es obligatorio
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Nombre comercial</mat-label>
+                            <input matInput formControlName="nombreComercial">
+                        </mat-form-field>
+                    </mat-card-content>
+                </mat-card>
+
+                <mat-card class="compact-card">
+                    <mat-card-header>
+                        <h2>Giro y Contacto</h2>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Giro</mat-label>
+                            <input matInput formControlName="giro">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Email</mat-label>
+                            <input matInput formControlName="email" type="email" required>
+                            <mat-error *ngIf="afiliacionForm.get('email')?.hasError('required')">
+                                Email es obligatorio
+                            </mat-error>
+                            <mat-error *ngIf="afiliacionForm.get('email')?.hasError('email')">
+                                Email inválido
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Página Web</mat-label>
+                            <input matInput formControlName="paginaWeb" type="url">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Facebook</mat-label>
+                            <input matInput formControlName="facebook">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Google Maps</mat-label>
+                            <input matInput formControlName="googleMaps">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Instagram</mat-label>
+                            <input matInput formControlName="instagram">
+                        </mat-form-field>
+                    </mat-card-content>
+                </mat-card>
+
+            </div>
+
+            <!-- Sección 3: Giro y redes sociales -->
+            <div class="card-row">
+                <mat-card class="compact-card">
+                    <mat-card-header>
+                        <h2>Datos Fiscales</h2>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Dominio fiscal</mat-label>
+                            <input matInput formControlName="dominioFiscal">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Domicilio sucursal</mat-label>
+                            <input matInput formControlName="domicilioSucursal" required>
+                            <mat-error *ngIf="afiliacionForm.get('domicilioSucursal')?.hasError('required')">
+                                Este campo es obligatorio
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>RFC</mat-label>
+                            <input matInput formControlName="rfc" required pattern="^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$">
+                            <mat-error *ngIf="afiliacionForm.get('rfc')?.hasError('required')">
+                                RFC es obligatorio
+                            </mat-error>
+                            <mat-error *ngIf="afiliacionForm.get('rfc')?.hasError('pattern')">
+                                Formato de RFC inválido
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Tel. Oficina</mat-label>
+                            <input matInput formControlName="telefonoOficina" type="tel">
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Tel. de propietario</mat-label>
+                            <input matInput formControlName="telefonoPropietario" type="tel" required>
+                            <mat-error *ngIf="afiliacionForm.get('telefonoPropietario')?.hasError('required')">
+                                Teléfono es obligatorio
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Fecha de nacimiento</mat-label>
+                            <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento" required>
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-error *ngIf="afiliacionForm.get('fechaNacimiento')?.hasError('required')">
+                                Fecha de nacimiento es obligatoria
+                            </mat-error>
+                        </mat-form-field>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Sección 4: Documentos -->
+                <mat-card class="compact-card">
+                    <mat-card-header>
+                        <h2>Documentos</h2>
+                    </mat-card-header>
+
+                    <mat-card-content>
+                        <div class="file-upload-section">
+                            <h3>Comprobante Dom. Sucursal</h3>
+                            <input type="file" #comprobanteSucursal
+                                (change)="onFileSelected($event, 'comprobanteSucursal')" hidden>
+                            <button mat-raised-button color="primary" (click)="comprobanteSucursal.click()">
+                                Subir Archivo
+                            </button>
+                            <span
+                                *ngIf="afiliacionForm.get('comprobanteSucursal')?.value">{{afiliacionForm.get('comprobanteSucursal')?.value?.name}}</span>
+                        </div>
+
+                        <!-- Repetir para los otros campos de archivo -->
+                        <div class="file-upload-section">
+                            <h3>Comprobante Dom. Matriz</h3>
+                            <input type="file" #comprobanteMatriz (change)="onFileSelected($event, 'comprobanteMatriz')"
+                                hidden>
+                            <button mat-raised-button color="primary" (click)="comprobanteMatriz.click()">
+                                Subir Archivo
+                            </button>
+                            <span
+                                *ngIf="afiliacionForm.get('comprobanteMatriz')?.value">{{afiliacionForm.get('comprobanteMatriz')?.value?.name}}</span>
+                        </div>
+
+                        <div class="file-upload-section">
+                            <h3>INE</h3>
+                            <input type="file" #ine (change)="onFileSelected($event, 'ine')" hidden>
+                            <button mat-raised-button color="primary" (click)="ine.click()">
+                                Subir Archivo
+                            </button>
+                            <span
+                                *ngIf="afiliacionForm.get('ine')?.value">{{afiliacionForm.get('ine')?.value?.name}}</span>
+                        </div>
+
+                        <div class="file-upload-section">
+                            <h3>CSF</h3>
+                            <input type="file" #csf (change)="onFileSelected($event, 'csf')" hidden>
+                            <button mat-raised-button color="primary" (click)="csf.click()">
+                                Subir Archivo
+                            </button>
+                            <span
+                                *ngIf="afiliacionForm.get('csf')?.value">{{afiliacionForm.get('csf')?.value?.name}}</span>
+                        </div>
+
+                        <div class="file-upload-section">
+                            <h3>Logotipo en PDF Editable</h3>
+                            <input type="file" #logoPdf (change)="onFileSelected($event, 'logoPdf')" hidden
+                                accept=".pdf">
+                            <button mat-raised-button color="primary" (click)="logoPdf.click()">
+                                Subir Archivo
+                            </button>
+                            <span
+                                *ngIf="afiliacionForm.get('logoPdf')?.value">{{afiliacionForm.get('logoPdf')?.value?.name}}</span>
+                        </div>
+
+                        <div class="file-upload-section">
+                            <h3>Logotipo en PNG</h3>
+                            <input type="file" #logoPng (change)="onFileSelected($event, 'logoPng')" hidden
+                                accept=".png">
+                            <button mat-raised-button color="primary" (click)="logoPng.click()">
+                                Subir Archivo
+                            </button>
+                            <span
+                                *ngIf="afiliacionForm.get('logoPng')?.value">{{afiliacionForm.get('logoPng')?.value?.name}}</span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+
+            <div class="submit-section">
+                <button mat-raised-button color="primary" type="submit" [disabled]="!afiliacionForm.valid">
+                    ENVIAR SOLICITUD
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

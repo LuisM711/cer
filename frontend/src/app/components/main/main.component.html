@@ -9,10 +9,38 @@
         <h1 class="title">AFILIADOS</h1>
 
         <div class="icon-container right-icon">
+            <!-- notifications_unread -->
+            <button mat-icon-button class="transparent-button" (click)="toggleNotifications()">
+                <mat-icon>notifications</mat-icon>
+            </button>
+
             <button mat-icon-button routerLink="/afiliacion" class="transparent-button">
                 <mat-icon>add</mat-icon>
             </button>
         </div>
+    </div>
+    <div class="notifications-popup" *ngIf="showNotifications"
+        style="padding: 30px; background-color: darkgray; align-self: flex-end;">
+        <h3 style="text-align: center;">Notificaciones</h3>
+        <table class="notifications-table"
+            style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+            <!-- <thead>
+                <tr style="background-color: #f2f2f2; text-align: left;">
+                    <th style="padding: 8px; border-bottom: 2px solid #ddd;">Notificación</th>
+                    <th style="padding: 8px; border-bottom: 2px solid #ddd;">Fecha</th>
+                </tr>
+            </thead> -->
+            <tbody>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">Cumpleaños KITACRUDAS</td>
+                    <td style="padding: 8px;">03/06/2025</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px;">Pago afiliación CHINALOA</td>
+                    <td style="padding: 8px;">3/06/2025</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div id="cartas">

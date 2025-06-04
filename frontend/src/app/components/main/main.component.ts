@@ -12,5 +12,10 @@ import { RouterModule } from '@angular/router';
   styleUrl: './main.component.css'
 })
 export class MainComponent {
+  showNotifications: boolean = false;
+
+    toggleNotifications(): void {
+        this.showNotifications = !this.showNotifications;
+    }
 
 }

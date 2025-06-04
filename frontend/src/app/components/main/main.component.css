@@ -21,6 +21,7 @@
 
 .header-bar .icon-container.right-icon {
     justify-content: flex-end;
+    gap: 20px;
 }
 
 .header-bar .transparent-button {

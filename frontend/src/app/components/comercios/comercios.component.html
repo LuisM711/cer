@@ -1,27 +1,26 @@
 <header
-    style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-around; gap: 10px; background-color: lightgreen;">
-    <img src="/assets/logo_cer.png" alt="" style="width: 50px;">
+    style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-around; gap: 10px; background-color: lightgreen; min-height: 100px;">
+    <img src="/assets/logo_cer.png" alt="Logo CER" style="width: 50px;">
     <h3>Comercios afiliados</h3>
-    <input type="text" name="buscar" id="" placeholder="Buscar...">
+    <input type="text" [(ngModel)]="searchText" (ngModelChange)="onSearchChange($event)" placeholder="Buscar..."
+        matInput />
+
 </header>
+<p *ngIf="noResults" class="no-results">No se encontraron resultados.</p>
+
 <table style="width: 100%; border-collapse: collapse; margin-top: 20px;" class="table-striped">
     <tbody>
-        <tr>
-            <td><img src="/assets/logos/flexi.jpg" alt="" style="height: 50px;"></td>
-            <td>Flexi</td>
-            <td><button><mat-icon>visibility</mat-icon></button></td>
+        <tr *ngFor="let comercio of comercios">
+            <td>
+                <img [src]="environment.backendUrl + '/documentos/' + comercio.id + '/logoPng'"
+                    alt="{{ comercio.nombreComercial }}" style="height: 50px;">
+            </td>
+            <td>{{ comercio.nombreComercial }}</td>
+            <td>
+                <button type="button" mat-raised-button color="primary" (click)="viewComercio(comercio.id)">
+                    <mat-icon>visibility</mat-icon>Ver detalles
+                </button>
+            </td>
         </tr>
-        <!--  -->
-        <!-- <tr>
-            <td><img src="/assets/logos/saluddigna.png" alt="" style="height: 50px;"></td>
-            <td>Salud Digna</td>
-            <td><button><mat-icon>visibility</mat-icon></button></td>
-        </tr>
-
-        <tr>
-            <td><img src="/assets/logos/sukarne.jpg" alt="" style="height: 50px;"></td>
-            <td>SuKarne</td>
-            <td><button><mat-icon>visibility</mat-icon></button></td>
-        </tr> -->
     </tbody>
 </table>

@@ -19,3 +19,14 @@ td {
     text-align: center;
     font-size: 30px;
 }
+input[type="text"] {
+
+    height: 30px;
+    font-size: 20px;
+    padding: 5px;
+}
+.no-results {
+  color: #999;
+  text-align: center;
+  margin-top: 20px;
+}

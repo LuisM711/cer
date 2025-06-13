@@ -3,7 +3,7 @@ const session = require('express-session');
 const routes = require('./routes');
 const cors = require('cors');
 const path = require('path');
-
+const fileUpload = require('express-fileupload');
 //const cookieParser = require('cookie-parser');
 //const path = require('path');
 const dotenv = require('dotenv');
@@ -19,6 +19,12 @@ const sequelize = require('./database.js');
 //const morgan = require('morgan');
 //app.use(cookieParser());
 //app.use(morgan('dev'));
+app.use(fileUpload({
+  createParentPath: true,
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+  abortOnLimit: true,
+  responseOnLimit: 'El archivo excede el tamaño máximo permitido de 50 MB'
+}));
 app.use(express.json());
 //app use multer
 //app.use(bodyParser.urlencoded({ extended: true }));
@@ -38,8 +44,7 @@ sequelize.sync({ force: true }).then(() => {
 });
 
 
-// app.use(express.static('public'));
-app.use('/public', express.static(path.join(__dirname, 'public')));
+// app.use('/documentos', express.static(path.join(__dirname, 'documentos')));
 
 app.use('/', routes());
 app.listen(process.env.BACKEND_PORT, () => {

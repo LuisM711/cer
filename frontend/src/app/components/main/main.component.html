@@ -24,22 +24,13 @@
         <h3 style="text-align: center;">Notificaciones</h3>
         <table class="notifications-table"
             style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;">
-            <!-- <thead>
-                <tr style="background-color: #f2f2f2; text-align: left;">
-                    <th style="padding: 8px; border-bottom: 2px solid #ddd;">Notificación</th>
-                    <th style="padding: 8px; border-bottom: 2px solid #ddd;">Fecha</th>
-                </tr>
-            </thead> -->
-            <tbody>
-                <tr style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">Cumpleaños KITACRUDAS</td>
-                    <td style="padding: 8px;">03/06/2025</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px;">Pago afiliación CHINALOA</td>
-                    <td style="padding: 8px;">3/06/2025</td>
-                </tr>
+            <tbody *ngIf="birthdays.length > 0">
+                <tr *ngFor="let birthday of birthdays" style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 8px;">Cumpleaños {{ birthday.nombreComercial }}</td>
+                    <td style="padding: 8px;">{{ birthday.fechaNacimiento | date: 'dd / MMMM' }}</td>
             </tbody>
+            <tr *ngIf="birthdays.length === 0">
+                <td colspan="2" style="padding: 8px; text-align: center;">No hay notificaciones</td>
         </table>
     </div>
 
@@ -47,7 +38,7 @@
         <div class="cards-container">
             <mat-card class="affiliate-card" routerLink="/comercios">
                 <div class="image-container">
-                    <img mat-card-image src="/assets/comercios.png" alt="Comercios">
+                    <img mat-card-image src="/assets/comercios.png" alt="Comercios" loading="eager">
                 </div>
                 <mat-card-content>
                     <h2>COMERCIOS</h2>
@@ -55,12 +46,12 @@
             </mat-card>
 
             <div class="logo-container">
-                <img src="/assets/logo_cer.png" alt="Logo CER" class="logo-img">
+                <img src="/assets/logo_cer.png" alt="Logo CER" class="logo-img" loading="eager">
             </div>
 
             <mat-card class="affiliate-card" routerLink="/restaurantes">
                 <div class="image-container">
-                    <img mat-card-image src="/assets/restaurantes.png" alt="Restaurantes">
+                    <img mat-card-image src="/assets/restaurantes.png" alt="Restaurantes" loading="eager">
                 </div>
                 <mat-card-content>
                     <h2>RESTAURANTES</h2>

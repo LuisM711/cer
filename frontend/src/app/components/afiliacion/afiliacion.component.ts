@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
+import { AppService } from '../../app.service';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-afiliacion',
@@ -23,12 +25,16 @@ import { MatSelectModule } from '@angular/material/select';
     MatButtonModule,
     MatIconModule,
     MatTabsModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
+
   ],
   templateUrl: './afiliacion.component.html',
   styleUrls: ['./afiliacion.component.css']
 })
 export class AfiliacionComponent {
+  // inject AppService
+
 
   afiliacionForm: FormGroup;
   selectedTabIndex = 0;
@@ -61,13 +67,11 @@ export class AfiliacionComponent {
   ];
   subgiros: { value: number, name: string }[] = [];
 
-  onGiroChange(selectedGiroValue: number): void {
-    const selectedGiro = this.giros.find(g => g.value === selectedGiroValue);
+  onGiroChange(selectedGiro: any): void {
     this.subgiros = selectedGiro ? selectedGiro.subgiros : [];
-
-    // Resetear subgiro al cambiar giro
     this.afiliacionForm.get('subgiro')?.reset();
   }
+
 
   documentos = [
     { name: 'comprobanteSucursal', label: 'Comprobante Dom. Sucursal' },
@@ -80,7 +84,7 @@ export class AfiliacionComponent {
   fileInput: any;
   selectedGiro: any;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private appService: AppService, private snackBar: MatSnackBar) {
     this.afiliacionForm = this.fb.group({
       razonSocial: ['', Validators.required],
       nombreComercial: [''],
@@ -91,7 +95,7 @@ export class AfiliacionComponent {
       facebook: [''],
       googleMaps: [''],
       instagram: [''],
-      dominioFiscal: [''],
+      domicilioFiscal: [''],
       domicilioSucursal: ['', Validators.required],
       rfc: ['', [Validators.required, Validators.pattern(/^([A-ZÑ&]{3,4}) ?-?([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01]) ?-?([A-Z\d]{3})$/i)]],
       telefonoOficina: [''],
@@ -99,10 +103,14 @@ export class AfiliacionComponent {
       fechaNacimiento: ['', Validators.required],
       comprobanteSucursal: [null],
       comprobanteMatriz: [null],
-      ine: ['', Validators.required],
-      csf: ['', Validators.required],
-      logoPdf: ['', Validators.required],
-      logoPng: ['', Validators.required]
+      // ine: ['', Validators.required],
+      // csf: ['', Validators.required],
+      // logoPdf: ['', Validators.required],
+      // logoPng: ['', Validators.required]
+      ine: [''],
+      csf: [''],
+      logoPdf: [''],
+      logoPng: ['']
     });
   }
 
@@ -122,8 +130,8 @@ export class AfiliacionComponent {
   getCurrentTabControls(): FormGroup {
     const controlGroups = [
       ['razonSocial', 'nombreComercial'],
-      ['giro','subgiro', 'email', 'paginaWeb', 'facebook', 'googleMaps', 'instagram'],
-      ['dominioFiscal', 'domicilioSucursal', 'rfc', 'telefonoOficina', 'telefonoPropietario', 'fechaNacimiento'],
+      ['giro', 'subgiro', 'email', 'paginaWeb', 'facebook', 'googleMaps', 'instagram'],
+      ['domicilioFiscal', 'domicilioSucursal', 'rfc', 'telefonoOficina', 'telefonoPropietario', 'fechaNacimiento'],
       ['comprobanteSucursal', 'comprobanteMatriz', 'ine', 'csf', 'logoPdf', 'logoPng']
     ];
     const controls = controlGroups[this.selectedTabIndex];
@@ -138,30 +146,56 @@ export class AfiliacionComponent {
   }
 
   onFileSelected(event: Event, controlName: string): void {
-    // Asegurarse de que el evento es del tipo correcto
     if (!(event.target instanceof HTMLInputElement)) {
       return;
     }
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.afiliacionForm.get(controlName)?.setValue(input.files[0]);
+      const file = input.files[0];
+      let isValid = false;
+      if (controlName === 'logoPng') {
+        isValid = file.type === 'image/png';
+      } else {
+        isValid = file.type.startsWith('image/') || file.type === 'application/pdf';
+      }
+      if (!isValid) {
+        alert('Tipo de archivo no permitido para ' + controlName);
+        input.value = '';
+        return;
+      }
+      this.afiliacionForm.get(controlName)?.setValue(file);
     }
   }
-
   onSubmit(): void {
     if (this.afiliacionForm.valid) {
       const formData = new FormData();
       Object.entries(this.afiliacionForm.value).forEach(([key, value]) => {
         if (value instanceof Blob) {
           formData.append(key, value);
-        } else if (typeof value === 'string') {
-          formData.append(key, value);
+        } else if (typeof value === 'object' && value !== null && 'name' in value) {
+          // Si es un objeto con campo 'name' como en giro o subgiro
+          formData.append(key, (value as { name: string }).name);
         } else {
           formData.append(key, value != null ? value.toString() : '');
         }
       });
-      // Aquí puedes enviar formData al backend
+
       console.log('Formulario válido. Enviando datos...', formData);
+      this.appService.createAfiliacion(formData).subscribe({
+        next: (response) => {
+          console.log('Afiliación creada exitosamente:', response);
+          this.snackBar.open('Afiliación creada exitosamente', 'Cerrar', {
+            duration: 3000,
+            panelClass: ['snack-success']
+          });
+          this.afiliacionForm.reset();
+
+        },
+        error: (error) => {
+          console.error('Error al crear la afiliación:', error);
+
+        }
+      });
     } else {
       console.log('Formulario inválido');
     }

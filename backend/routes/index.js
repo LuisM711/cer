@@ -12,24 +12,28 @@ module.exports = () => {
         return res.json({ message: 'Bienvenido a la API' });
     });
 
-    router.post('/afiliaciones', afiliacionController.createAfiliacion);
-    router.get('/afiliaciones', afiliacionController.getAfiliaciones);
-    router.get('/afiliaciones/:id', afiliacionController.getAfiliacionById);
+    router.post('/afiliaciones',verification.verifyToken, afiliacionController.createAfiliacion);
+    router.get('/afiliaciones',verification.verifyToken, afiliacionController.getAfiliaciones);
+    router.get('/afiliaciones/:id',verification.verifyToken, afiliacionController.getAfiliacionById);
 
-    router.get('/afiliaciones/giro/:giro', afiliacionController.getAfiliacionByGiro);
-    router.get('/documentos/:id/:tipo', documentosController.getDocumento);
-    router.get('/afiliaciones/nombre/:nombreComercial/:giro', afiliacionController.getAfiliacionPorNombreYGiro);
+    router.get('/afiliaciones/giro/:giro',verification.verifyToken, afiliacionController.getAfiliacionByGiro);
+    router.get('/documentos/:id/:tipo',verification.verifyToken, documentosController.getDocumento);
+    router.get('/afiliaciones/nombre/:nombreComercial/:giro',verification.verifyToken, afiliacionController.getAfiliacionPorNombreYGiro);
     router.get('/birthdays', afiliacionController.getBirthdays);
 
-    router.post('/crear-admin', adminController.createAdmin);
-    router.get('/admins', adminController.getAdmins);
-    router.get('/admins/:id', adminController.getAdminById);
-    router.put('/admins/:id', adminController.updateAdmin);
-    router.delete('/admins/:id', adminController.deleteAdmin);
+    router.post('/crear-admin',verification.verifyToken, adminController.createAdmin);
+    router.get('/admins',verification.verifyToken, adminController.getAdmins);
+    router.get('/admins/:id',verification.verifyToken, adminController.getAdminById);
+    router.put('/admins/:id',verification.verifyToken, adminController.updateAdmin);
+    router.delete('/admins/:id',verification.verifyToken, adminController.deleteAdmin);
 
     //login
     router.post('/login', loginController.login);
     router.post('/logout', loginController.logout);
+
+    //verification.verifyToken,
+
+    router.get('/info', verification.getInfo);
 
 
     return router;

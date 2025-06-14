@@ -22,18 +22,18 @@ module.exports.verifyToken = (req, res, next) => {
 
 
 }
-module.exports.verifyAdmin = (req, res, next) => {
-    try {
-        if (req.session.token.rolId === 1) {
-            return next();
-        } else {
-            return res.status(401).json({ error: 'No autorizado' });
-        }
+// module.exports.verifyAdmin = (req, res, next) => {
+//     try {
+//         if (req.session.token.rolId === 1) {
+//             return next();
+//         } else {
+//             return res.status(401).json({ error: 'No autorizado' });
+//         }
         
-    } catch (error) {
-        return res.status(401).json({ error: 'No autorizado' });
+//     } catch (error) {
+//         return res.status(401).json({ error: 'No autorizado' });
         
-    }
+//     }
 
 
-}
+// }

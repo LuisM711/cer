@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AppService } from '../../app.service';
 
 @Component({
@@ -19,8 +19,7 @@ import { AppService } from '../../app.service';
     MatInputModule,
     MatIconModule,
     MatButtonModule,
-    FormsModule,
-    RouterLink
+    FormsModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -29,7 +28,7 @@ export class LoginComponent {
   correo: string = '';
   contrasena: string = '';
 
-  constructor(private appService: AppService) {}
+  constructor(private appService: AppService, private router: Router) {}
 
   login() {
     const loginData = {
@@ -40,7 +39,10 @@ export class LoginComponent {
     this.appService.login(loginData).subscribe({
       next: (response) => {
         console.log('Login successful', response);
-        // redirigir o guardar token, etc.
+        // Navigate to main
+        this.router.navigate(['/main']);
+
+        
       },
       error: (error) => {
         console.error('Login failed', error);

@@ -92,6 +92,14 @@ export class AppService {
       { withCredentials: true }
     );
   }
+  //    router.get('/info', verification.getInfo);
+
+  getInfo(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/info`,
+      { withCredentials: true }
+    );
+  }
 
 
 

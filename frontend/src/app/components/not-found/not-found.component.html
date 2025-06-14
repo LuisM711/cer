@@ -1,1 +1,38 @@
-<p>not-found works!</p>
+<style>
+    .navbar {
+        background-color: lightgreen;
+        color: black;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        height: 64px;
+    }
+    .navbar-logo {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+    .navbar-title {
+        font-size: 20px;
+        font-weight: 500;
+    }
+    /* Ajustar el contenido para que no quede tapado por el navbar */
+    .notfound-container {
+        margin-top: 80px;
+        text-align: center;
+    }
+</style>
+
+<div class="navbar">
+    <img src="/assets/logo_cer.png" alt="Logo CER" class="navbar-logo">
+    <span class="navbar-title">Consejo empresarial restaurantero</span>
+</div>
+
+<div class="notfound-container">
+    <mat-card class="notfound-card">
+            <h1>404</h1>
+            <h2>Página no encontrada</h2>
+            <p>Lo sentimos, la página que estás buscando no existe o fue movida.</p>
+            <button mat-raised-button color="primary" routerLink="/">Volver al inicio</button>
+    </mat-card>
+</div>

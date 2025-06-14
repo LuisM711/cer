@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AppService } from '../../app.service';
 
 @Component({
   selector: 'app-login',
@@ -25,5 +26,26 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  // No se necesita lógica adicional para este ejemplo
+  correo: string = '';
+  contrasena: string = '';
+
+  constructor(private appService: AppService) {}
+
+  login() {
+    const loginData = {
+      email: this.correo,
+      password: this.contrasena
+    };
+
+    this.appService.login(loginData).subscribe({
+      next: (response) => {
+        console.log('Login successful', response);
+        // redirigir o guardar token, etc.
+      },
+      error: (error) => {
+        console.error('Login failed', error);
+        // mostrar mensaje de error al usuario
+      }
+    });
+  }
 }

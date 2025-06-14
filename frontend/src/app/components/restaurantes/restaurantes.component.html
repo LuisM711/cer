@@ -6,21 +6,23 @@
         matInput />
 
 </header>
-<p *ngIf="noResults" class="no-results">No se encontraron resultados.</p>
+<div style="min-height: 100vh;">
+    <p *ngIf="noResults" class="no-results">No se encontraron resultados.</p>
 
-<table style="width: 100%; border-collapse: collapse; margin-top: 20px;" class="table-striped">
-    <tbody>
-        <tr *ngFor="let restaurante of restaurantes">
-            <td>
-                <img [src]="environment.backendUrl + '/documentos/' + restaurante.id + '/logoPng'"
-                    alt="{{ restaurante.nombreComercial }}" style="height: 50px;">
-            </td>
-            <td>{{ restaurante.nombreComercial }}</td>
-            <td>
-                <button type="button" mat-raised-button color="primary" (click)="viewRestaurante(restaurante.id)">
-                    <mat-icon>visibility</mat-icon>Ver detalles
-                </button>
-            </td>
-        </tr>
-    </tbody>
-</table>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px;" class="table-striped">
+        <tbody>
+            <tr *ngFor="let restaurante of restaurantes">
+                <td>
+                    <img [src]="environment.backendUrl + '/documentos/' + restaurante.id + '/logoPng'"
+                        alt="{{ restaurante.nombreComercial }}" style="height: 50px;">
+                </td>
+                <td>{{ restaurante.nombreComercial }}</td>
+                <td>
+                    <button type="button" mat-raised-button color="primary" (click)="viewRestaurante(restaurante.id)">
+                        <mat-icon>visibility</mat-icon>Ver detalles
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

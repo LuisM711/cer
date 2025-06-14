@@ -4,7 +4,8 @@ const verification = require('../middlewares/verification.js');
 
 const afiliacionController = require('../controllers/afiliacionController.js');
 const documentosController = require('../controllers/documentosController.js');
-
+const adminController = require('../controllers/adminController.js');
+const loginController = require('../controllers/loginController.js');
 
 module.exports = () => {
     router.get('/', (req, res) => {
@@ -19,6 +20,17 @@ module.exports = () => {
     router.get('/documentos/:id/:tipo', documentosController.getDocumento);
     router.get('/afiliaciones/nombre/:nombreComercial/:giro', afiliacionController.getAfiliacionPorNombreYGiro);
     router.get('/birthdays', afiliacionController.getBirthdays);
+
+    router.post('/crear-admin', adminController.createAdmin);
+    router.get('/admins', adminController.getAdmins);
+    router.get('/admins/:id', adminController.getAdminById);
+    router.put('/admins/:id', adminController.updateAdmin);
+    router.delete('/admins/:id', adminController.deleteAdmin);
+
+    //login
+    router.post('/login', loginController.login);
+    router.post('/logout', loginController.logout);
+
 
     return router;
 }

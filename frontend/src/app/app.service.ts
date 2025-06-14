@@ -14,7 +14,7 @@ export class AppService {
     // const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post(
       `${environment.backendUrl}/afiliaciones`, data,
-      {  withCredentials: true }
+      { withCredentials: true }
     );
   }
   getAfiliacionByGiro(giro: string): Observable<any> {
@@ -46,4 +46,58 @@ export class AppService {
       { withCredentials: true }
     );
   }
+  createAdmin(data: any): Observable<any> {
+    return this.http.post(
+      `${environment.backendUrl}/crear-admin`, data,
+      { withCredentials: true }
+    );
+  }
+
+  getAdmins(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/admins`,
+      { withCredentials: true }
+    );
+  }
+
+  getAdminById(id: string): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/admins/${id}`,
+      { withCredentials: true }
+    );
+  }
+
+  updateAdmin(id: string, data: any): Observable<any> {
+    return this.http.put(
+      `${environment.backendUrl}/admins/${id}`, data,
+      { withCredentials: true }
+    );
+  }
+
+  deleteAdmin(id: string): Observable<any> {
+    return this.http.delete(
+      `${environment.backendUrl}/admins/${id}`,
+      { withCredentials: true }
+    );
+  }
+  login(data: any): Observable<any> {
+    return this.http.post(
+      `${environment.backendUrl}/login`, data,
+      { withCredentials: true }
+    );
+  }
+  logout(): Observable<any> {
+    return this.http.post(
+      `${environment.backendUrl}/logout`, {},
+      { withCredentials: true }
+    );
+  }
+
+
+
+
+
+
+
+
 }

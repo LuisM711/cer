@@ -12,11 +12,11 @@ import { verificarGuard } from './verificar.guard';
 export const routes: Routes = [
 
     { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: 'login', component: LoginComponent },
-    { path: 'afiliacion', component: AfiliacionComponent, canActivate: [verificarGuard] },
-    { path: 'main', component: MainComponent, canActivate: [verificarGuard] },
-    { path: 'comercios', component: ComerciosComponent, canActivate: [verificarGuard] },
-    { path: 'restaurantes', component: RestaurantesComponent, canActivate: [verificarGuard] },
+    { path: 'login', component: LoginComponent, title: 'Inicio de sesión' },
+    { path: 'afiliacion', component: AfiliacionComponent, canActivate: [verificarGuard], title: 'Afiliación' },
+    { path: 'main', component: MainComponent, canActivate: [verificarGuard], title: 'Consejo Empresarial Restaurantero' },
+    { path: 'comercios', component: ComerciosComponent, canActivate: [verificarGuard], title: 'Comercios' },
+    { path: 'restaurantes', component: RestaurantesComponent, canActivate: [verificarGuard], title: 'Restaurantes' },
 
 
 

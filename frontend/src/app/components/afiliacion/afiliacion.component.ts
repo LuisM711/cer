@@ -11,6 +11,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
 import { AppService } from '../../app.service';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-afiliacion',
@@ -26,7 +27,8 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
     MatIconModule,
     MatTabsModule,
     MatSelectModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    HeaderComponent
 
   ],
   templateUrl: './afiliacion.component.html',

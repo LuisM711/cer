@@ -1,7 +1,7 @@
-<!-- afiliacion.component.html -->
-<div style="min-height: 100vh;">
+<app-header></app-header>
+<div style="min-height: 90vh; align-content: center;">
     <div class="form-container">
-        <h1>AFILIACIÓN</h1>
+        <h1>Registro de afiliación</h1>
 
         <form [formGroup]="afiliacionForm" (ngSubmit)="onSubmit()" class="form-content">
             <mat-tab-group [(selectedIndex)]="selectedTabIndex">

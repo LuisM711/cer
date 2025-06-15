@@ -9,8 +9,8 @@ export const errorInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next:
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       let errorMessage = 'Ocurrió un error inesperado';
-      if (error.error && error.error.message) {
-        errorMessage = error.error.message;
+      if (error.error) {
+        errorMessage = error.error.message || error.error.error || errorMessage;
       }
       snackBar.open(errorMessage, 'Cerrar', { duration: 3000 });
       return throwError(() => error);

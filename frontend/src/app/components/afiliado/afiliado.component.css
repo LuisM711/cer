@@ -1,0 +1,36 @@
+/* afiliado.component.css */
+mat-card-title{
+    text-align: center;
+}
+.afiliado-container {
+    min-height: 90vh;
+  display: flex;
+  gap: 24px;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.formulario, .documentos {
+  flex: 1;
+}
+
+.full-width {
+  width: 100%;
+}
+.file-upload-button {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.doc-item {
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+
+.archivo-nombre {
+  font-size: 13px;
+  color: #555;
+  margin-top: 4px;
+}

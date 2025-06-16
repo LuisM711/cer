@@ -1,37 +1,36 @@
-const Admin = require('../models/Admin');
+//loginController.js
+const Admin = require('../models/Admin.js');
+const Afiliacion = require('../models/Afiliacion.js');
 
 module.exports.login = async (req, res) => {
     try {
+
+        req.session.token = null;
         const { email, password } = req.body;
-        console.log(req.body);
-        const admin = await Admin.findOne({ where: { email } });
-        if (!admin) {
-            return res.status(404).json({ error: 'Administrador no encontrado' });
+        let user = null;
+        let role = '';
+
+        user = await Admin.findOne({ where: { email } });
+        if (user && user.password === password) {
+            role = 'admin';
+        } else {
+            user = await Afiliacion.findOne({ where: { email } });
+            if (user && user.password === password) {
+                role = 'afiliado';
+            }
         }
 
-        if (admin.password !== password) {
-            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        if (!user) {
+            return res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
-        req.session.token = {
-            id: admin.id,
-            email: admin.email,
-            nombre: admin.nombre,
-            telefono: admin.telefono,
-            isActive: admin.isActive
-        }
-        return res.status(200).json({
-            id: admin.id,
-            nombre: admin.nombre,
-            email: admin.email,
-            telefono: admin.telefono,
-            isActive: admin.isActive
-        });
+        req.session.token = { id: user.id, role };
+        return res.json({ message: 'Login exitoso', role });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ error: 'Error al iniciar sesión' });
+        return res.status(500).json({ error: 'Error en el login' });
     }
-}
+};
 
 module.exports.logout = (req, res) => {
     req.session.destroy((err) => {

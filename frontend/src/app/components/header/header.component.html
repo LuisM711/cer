@@ -1,33 +1,36 @@
 <div class="header-bar">
-        <div class="icon-container left-icon">
-            <button mat-icon-button routerLink="/grupos" class="transparent-button">
-                <mat-icon>group</mat-icon>
-            </button>
-        </div>
-
-        <h1 class="title">Consejo Empresarial Restaurantero</h1>
-
-        <div class="icon-container right-icon">
-            <!-- notifications_unread -->
-            <button mat-icon-button class="transparent-button" (click)="toggleNotifications()">
-                <mat-icon>notifications</mat-icon>
-            </button>
-
-            <button mat-icon-button routerLink="/afiliacion" class="transparent-button">
-                <mat-icon>add</mat-icon>
-            </button>
-        </div>
+    <div class="icon-container left-icon">
+        <button mat-icon-button routerLink="/grupos" class="transparent-button" matTooltip="Grupos">
+            <mat-icon>group</mat-icon>
+        </button>
     </div>
-    <div class="notifications-popup" *ngIf="showNotifications">
-        <h3 style="text-align: center;">Notificaciones</h3>
-        <table class="notifications-table"
-            style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;">
-            <tbody *ngIf="birthdays.length > 0">
-                <tr *ngFor="let birthday of birthdays" style="border-bottom: 1px solid #ddd;">
-                    <td style="padding: 8px;">Cumpleaños {{ birthday.nombreComercial }}</td>
-                    <td style="padding: 8px;">{{ birthday.fechaNacimiento | date: 'dd / MMMM' }}</td>
-            </tbody>
-            <tr *ngIf="birthdays.length === 0">
-                <td colspan="2" style="padding: 8px; text-align: center;">No hay notificaciones</td>
-        </table>
+
+    <h1 class="title">Consejo Empresarial Restaurantero</h1>
+
+    <div class="icon-container right-icon">
+        <button mat-icon-button class="transparent-button" (click)="toggleNotifications()" *ngIf="isAdmin" matTooltip="Notificaciones">
+            <mat-icon>notifications</mat-icon>
+        </button>
+
+        <button mat-icon-button routerLink="/afiliacion" class="transparent-button" *ngIf="isAdmin" matTooltip="Agregar afiliado">
+            <mat-icon>add</mat-icon>
+        </button>
+
+        <button mat-icon-button (click)="logout()" class="transparent-button" matTooltip="Cerrar sesión">
+            <mat-icon>logout</mat-icon>
+        </button>
     </div>
+</div>
+
+<div class="notifications-popup" *ngIf="showNotifications">
+    <h3 style="text-align: center;">Notificaciones</h3>
+    <table class="notifications-table" style="width:100%; border-collapse: collapse; font-family: Arial, sans-serif;">
+        <tbody *ngIf="birthdays.length > 0">
+            <tr *ngFor="let birthday of birthdays" style="border-bottom: 1px solid #ddd;">
+                <td style="padding: 8px;">Cumpleaños {{ birthday.nombreComercial }}</td>
+                <td style="padding: 8px;">{{ birthday.fechaNacimiento | date: 'dd / MMMM' }}</td>
+        </tbody>
+        <tr *ngIf="birthdays.length === 0">
+            <td colspan="2" style="padding: 8px; text-align: center;">No hay notificaciones</td>
+    </table>
+</div>

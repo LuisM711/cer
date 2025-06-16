@@ -93,6 +93,7 @@ export class AfiliacionComponent {
       giro: ['', Validators.required],
       subgiro: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
       paginaWeb: [''],
       facebook: [''],
       googleMaps: [''],
@@ -132,7 +133,7 @@ export class AfiliacionComponent {
   getCurrentTabControls(): FormGroup {
     const controlGroups = [
       ['razonSocial', 'nombreComercial'],
-      ['giro', 'subgiro', 'email', 'paginaWeb', 'facebook', 'googleMaps', 'instagram'],
+      ['giro', 'subgiro', 'email', 'password', 'paginaWeb', 'facebook', 'googleMaps', 'instagram'],
       ['domicilioFiscal', 'domicilioSucursal', 'rfc', 'telefonoOficina', 'telefonoPropietario', 'fechaNacimiento'],
       ['comprobanteSucursal', 'comprobanteMatriz', 'ine', 'csf', 'logoPdf', 'logoPng']
     ];

@@ -87,16 +87,43 @@ export class AppService {
     );
   }
   logout(): Observable<any> {
-    return this.http.post(
-      `${environment.backendUrl}/logout`, {},
+    return this.http.get(
+      `${environment.backendUrl}/logout`,
       { withCredentials: true }
     );
   }
   //    router.get('/info', verification.getInfo);
 
-  getInfo(): Observable<any> {
+  // getInfo(): Observable<any> {
+  //   return this.http.get(
+  //     `${environment.backendUrl}/info`,
+  //     { withCredentials: true }
+  //   );
+  // }
+
+  verifyToken(): Observable<any> {
     return this.http.get(
-      `${environment.backendUrl}/info`,
+      `${environment.backendUrl}/verifyToken`,
+      { withCredentials: true }
+    );
+  }
+  verifyAdmin(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/verifyAdmin`,
+      { withCredentials: true }
+    );
+  }
+  verifyAfiliado(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/verifyAfiliado`,
+      { withCredentials: true }
+    );
+  }
+
+//    router.get('/mis-datos', afiliacionController.getMiAfiliacion);
+  getMiAfiliacion(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/mis-datos`,
       { withCredentials: true }
     );
   }

@@ -125,3 +125,21 @@ module.exports.getBirthdays = async (req, res) => {
     return res.status(500).json({ error: 'Error al obtener los cumpleaños' });
   }
 };
+module.exports.getMiAfiliacion = async (req, res) => {
+    try {
+        const id = req.session.token.id;
+
+        const afiliacion = await Afiliacion.findOne({
+            where: {
+                id: id
+            }
+        });
+        if (!afiliacion) {
+            return res.status(404).json({ error: 'Afiliación no encontrada' });
+        }
+        return res.status(200).json(afiliacion);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: 'Error al obtener la afiliación' });
+    }
+}

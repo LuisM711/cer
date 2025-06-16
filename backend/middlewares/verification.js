@@ -22,18 +22,55 @@ module.exports.verifyToken = (req, res, next) => {
 
 
 }
-// module.exports.verifyAdmin = (req, res, next) => {
-//     try {
-//         if (req.session.token.rolId === 1) {
-//             return next();
-//         } else {
-//             return res.status(401).json({ error: 'No autorizado' });
-//         }
-        
-//     } catch (error) {
-//         return res.status(401).json({ error: 'No autorizado' });
-        
-//     }
+module.exports.verifyAdmin = (req, res, next) => {
+    try {
+        if (req.session.token.role === 'admin') {
+            return next();
+        } else {
+            return res.status(401).json({ error: 'No autorizado' });
+        }
+
+    } catch (error) {
+        return res.status(401).json({ error: 'No autorizado' });
+
+    }
 
 
-// }
+}
+module.exports.verifyAfiliado = (req, res, next) => {
+    try {
+        if (req.session.token.role === 'afiliado') {
+
+            return next();
+        } else {
+            return res.status(401).json({ error: 'No autorizado' });
+        }
+
+    } catch (error) {
+        return res.status(401).json({ error: 'No autorizado' });
+
+    }
+
+
+}
+module.exports.isLogged = (req, res) => {
+    if (req.session.token) {
+        return res.json({ success: true, role: req.session.token.role });
+    } else {
+        return res.json({ success: false });
+    }
+}
+module.exports.isAdmin = (req, res) => {
+    if (req.session.token && req.session.token.role === 'admin') {
+        return res.json({ success: true, role: req.session.token.role });
+    } else {
+        return res.json({ success: false });
+    }
+}
+module.exports.isAfiliado = (req, res) => {
+    if (req.session.token && req.session.token.role === 'afiliado') {
+        return res.json({ success: true, role: req.session.token.role });
+    } else {
+        return res.json({ success: false });
+    }
+}

@@ -5,7 +5,7 @@
     </mat-card-header>
 
     <mat-card-content>
-      <form class="login-form" #loginForm="ngForm">
+      <form class="login-form" #loginForm="ngForm" (ngSubmit)="login()">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo electrónico</mat-label>
           <input matInput placeholder="Ingrese su correo electrónico" [(ngModel)]="correo" name="correo" required>
@@ -18,15 +18,17 @@
             required>
           <mat-icon matSuffix>lock</mat-icon>
         </mat-form-field>
+        <mat-card-actions class="login-actions">
+          <button mat-raised-button color="primary" class="login-button" type="submit"
+            [disabled]="!correo || !contrasena">
+            INICIAR SESIÓN
+          </button>
+        </mat-card-actions>
       </form>
 
     </mat-card-content>
 
-    <mat-card-actions class="login-actions">
-  <button mat-raised-button color="primary" class="login-button" (click)="login()" [disabled]="!correo || !contrasena">
-    INICIAR SESIÓN
-  </button>
-</mat-card-actions>
+
 
   </mat-card>
 </div>

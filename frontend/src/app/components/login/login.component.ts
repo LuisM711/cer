@@ -28,9 +28,10 @@ export class LoginComponent {
   correo: string = '';
   contrasena: string = '';
 
-  constructor(private appService: AppService, private router: Router) {}
+  constructor(private appService: AppService, private router: Router) { }
 
   login() {
+    console.log("asdoiasdolikj");
     const loginData = {
       email: this.correo,
       password: this.contrasena
@@ -39,10 +40,13 @@ export class LoginComponent {
     this.appService.login(loginData).subscribe({
       next: (response) => {
         console.log('Login successful', response);
-        // Navigate to main
-        this.router.navigate(['/main']);
+        if (response.role === 'admin')
+          this.router.navigate(['/main']);
+        else if (response.role === 'afiliado')
+          this.router.navigate(['/afiliado']);
+        else throw new Error('Role not recognized');
 
-        
+
       },
       error: (error) => {
         console.error('Login failed', error);

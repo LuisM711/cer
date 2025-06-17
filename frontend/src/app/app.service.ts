@@ -129,6 +129,40 @@ export class AppService {
   }
 
 
+  getGiros(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/giros`,
+      { withCredentials: true }
+    );
+  }
+
+  getGiroById(id: string): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/giros/${id}`,
+      { withCredentials: true }
+    );
+  }
+
+  createGiro(data: any): Observable<any> {
+    return this.http.post(
+      `${environment.backendUrl}/giros`, data,
+      { withCredentials: true }
+    );
+  }
+
+  updateGiro(id: string, data: any): Observable<any> {
+    return this.http.put(
+      `${environment.backendUrl}/giros/${id}`, data,
+      { withCredentials: true }
+    );
+  }
+
+  deleteGiro(id: string): Observable<any> {
+    return this.http.delete(
+      `${environment.backendUrl}/giros/${id}`,
+      { withCredentials: true }
+    );
+  }
 
 
 

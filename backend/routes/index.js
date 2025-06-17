@@ -6,6 +6,7 @@ const afiliacionController = require('../controllers/afiliacionController.js');
 const documentosController = require('../controllers/documentosController.js');
 const adminController = require('../controllers/adminController.js');
 const loginController = require('../controllers/loginController.js');
+const giroController = require('../controllers/giroController.js');
 
 module.exports = () => {
     router.get('/', (req, res) => {
@@ -38,6 +39,14 @@ module.exports = () => {
     router.get('/verifyAfiliado', verification.isAfiliado);
 
     router.get('/mis-datos', afiliacionController.getMiAfiliacion);
+
+    //Giros
+    router.get('/giros', verification.verifyAdmin, giroController.getGiros);
+    router.get('/giros/:id', verification.verifyAdmin, giroController.getGiroById);
+    router.post('/giros', verification.verifyAdmin, giroController.createGiro);
+    router.put('/giros/:id', verification.verifyAdmin, giroController.updateGiro);
+    router.delete('/giros/:id', verification.verifyAdmin, giroController.deleteGiro);
+    
 
 
     return router;

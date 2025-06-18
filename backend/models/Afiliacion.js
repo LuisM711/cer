@@ -143,7 +143,14 @@ Afiliacion.init({
         allowNull: false
     },
 
-
+    numeroFactura: {
+        type: DataTypes.NUMBER,
+        allowNull: true
+    },
+    importeFactura: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
 
     // --- Estado ---
     isActive: {
@@ -231,6 +238,8 @@ Afiliacion.init({
                         fechaVencimiento: '2026-06-18',
                         poliza: 'POL213456',
                         polizaUbicacion: '2',
+                        numeroFactura: 123456,
+                        importeFactura: 1500.00,
 
                     },
                 }),
@@ -261,6 +270,8 @@ Afiliacion.init({
                         fechaVencimiento: '2026-06-20',
                         poliza: 'POL216556',
                         polizaUbicacion: '3',
+                        numeroFactura: 123456,
+                        importeFactura: 1500.00,
 
                     },
                 }),
@@ -291,6 +302,8 @@ Afiliacion.init({
                         fechaVencimiento: '2026-06-20',
                         poliza: 'POL916556',
                         polizaUbicacion: '4',
+                        numeroFactura: 123456,
+                        importeFactura: 1500.00,
 
                     },
                 })

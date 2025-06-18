@@ -1,3 +1,4 @@
+/* restaurantes.component.css */
 .table-striped tbody tr:nth-child(odd) {
     background-color: mediumseagreen;
 }

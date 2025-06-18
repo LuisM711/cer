@@ -272,6 +272,22 @@
                                     Póliza (ubicación) es obligatoria
                                 </mat-error>
                             </mat-form-field>
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>Número de factura</mat-label>
+                                <input matInput formControlName="numeroFactura">
+                                <mat-error
+                                    *ngIf="afiliacionForm.get('numeroFactura')?.hasError('required') && isControlInvalid('numeroFactura')">
+                                    Número de factura es obligatorio
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>Importe de factura</mat-label>
+                                <input matInput formControlName="importeFactura">
+                                <mat-error
+                                    *ngIf="afiliacionForm.get('importeFactura')?.hasError('required') && isControlInvalid('importeFactura')">
+                                    Importe de factura es obligatorio
+                                </mat-error>
+                            </mat-form-field>
 
                         </mat-card-content>
                     </mat-card>

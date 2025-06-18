@@ -129,6 +129,8 @@ export class AfiliacionComponent {
       fechaVencimiento: ['', Validators.required],
       poliza: ['', Validators.required],
       polizaUbicacion: ['', Validators.required],
+      numeroFactura: ['', Validators.required],
+      importeFactura: ['', Validators.required],
       ine: ['', Validators.required],
       csf: ['', Validators.required],
       logoPdf: ['', Validators.required],
@@ -221,7 +223,8 @@ export class AfiliacionComponent {
       // 3: Datos fiscales
       ['domicilioFiscal', 'domicilioSucursal', 'codigoPostal', 'rfc', 'telefonoOficina'],
       // 4: Fechas
-      ['fechaAlta', 'fechaAfiliacion', 'fechaVencimiento', 'poliza', 'polizaUbicacion'],
+      ['fechaAlta', 'fechaAfiliacion', 'fechaVencimiento', 'poliza', 'polizaUbicacion', 'numeroFactura',
+        'importeFactura'],
       // 5: Documentos
       ['comprobanteSucursal', 'comprobanteMatriz', 'ine', 'csf', 'logoPdf', 'logoPng']
     ];

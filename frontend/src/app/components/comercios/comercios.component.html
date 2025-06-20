@@ -1,3 +1,4 @@
+<!-- comercios.component.html -->
 <header
     style="width: 100%; display: flex; flex-direction: row; align-items: center; justify-content: space-around; gap: 10px; background-color: lightgreen; min-height: 100px;">
     <img src="/assets/logo_cer.png" alt="Logo CER" style="width: 50px;">
@@ -6,20 +7,27 @@
         matInput />
 
 </header>
-<div style="min-height: 90vh;">
+<div style="min-height: 90vh;text-align: center;margin-top: 20px;">
     <p *ngIf="noResults" class="no-results">No se encontraron resultados.</p>
 
+    <button type="button" mat-raised-button color="primary" (click)="reporteGeneral()">
+        <img src="/assets/logos/excel.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
+        Descargar reporte general
+    </button>
     <table style="width: 100%; border-collapse: collapse; margin-top: 20px;" class="table-striped">
         <tbody>
             <tr *ngFor="let comercio of comercios">
                 <td>
-                    <img [src]="environment.backendUrl + '/documentos/' + comercio.id + '/logoPng'"
-                        alt="{{ comercio.nombreComercial }}" style="height: 50px;">
+                    <img [src]="comercio.logoUrl" alt="{{ comercio.nombreComercial }}" style="height:50px">
                 </td>
                 <td>{{ comercio.nombreComercial }}</td>
-                <td>
+                <td style="display: flex;justify-content: center;align-items: center;gap: 20px;">
                     <button type="button" mat-raised-button color="primary" (click)="viewComercio(comercio.id)">
                         <mat-icon>visibility</mat-icon>Ver detalles
+                    </button>
+                    <button type="button" mat-raised-button color="primary"
+                        (click)="viewPolizaDerechos(comercio.id)">
+                        <mat-icon>print</mat-icon>Derechos de póliza
                     </button>
                 </td>
             </tr>

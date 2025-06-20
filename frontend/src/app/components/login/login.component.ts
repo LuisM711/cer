@@ -40,11 +40,7 @@ export class LoginComponent {
     this.appService.login(loginData).subscribe({
       next: (response) => {
         console.log('Login successful', response);
-        if (response.role === 'admin')
-          this.router.navigate(['/main']);
-        else if (response.role === 'afiliado')
-          this.router.navigate(['/afiliado']);
-        else throw new Error('Role not recognized');
+        this.router.navigate(['/main']);
 
 
       },

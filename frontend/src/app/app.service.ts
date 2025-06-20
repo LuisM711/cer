@@ -113,12 +113,7 @@ export class AppService {
       { withCredentials: true }
     );
   }
-  verifyAfiliado(): Observable<any> {
-    return this.http.get(
-      `${environment.backendUrl}/verifyAfiliado`,
-      { withCredentials: true }
-    );
-  }
+
 
 //    router.get('/mis-datos', afiliacionController.getMiAfiliacion);
   getMiAfiliacion(): Observable<any> {
@@ -163,6 +158,14 @@ export class AppService {
       { withCredentials: true }
     );
   }
+
+  updateAfiliacion(id: string, data: any): Observable<any> {
+    return this.http.put(
+      `${environment.backendUrl}/afiliaciones/${id}`, data,
+      { withCredentials: true }
+    );
+  }
+
 
 
 

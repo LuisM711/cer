@@ -8,6 +8,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { loadingInterceptor } from './components/interceptor/loading.interceptor';
 import { errorInterceptor } from './components/interceptor/error.interceptor';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,6 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor])),
     provideAnimationsAsync(),
     { provide: LOCALE_ID, useValue: 'es-MX' },
-    provideNativeDateAdapter()
+    provideNativeDateAdapter(),
+    { provide: LocationStrategy, useClass: HashLocationStrategy }
   ]
 };

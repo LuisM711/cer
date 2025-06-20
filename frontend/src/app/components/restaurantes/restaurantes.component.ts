@@ -1,12 +1,13 @@
 
-import { Component, Inject } from '@angular/core';
+
+import { AfterViewInit, Component, Inject, OnInit } from '@angular/core';
 import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { AppService } from '../../app.service';
 import { NgFor, CommonModule } from '@angular/common';
 import { environment } from '../../app.environment';
 import { MatButtonModule } from '@angular/material/button';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Subject, of } from 'rxjs';
 import { debounceTime, switchMap, distinctUntilChanged, catchError } from 'rxjs/operators';
@@ -14,6 +15,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { Workbook } from 'exceljs';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+
+
 @Component({
   selector: 'app-restaurantes',
   standalone: true,
@@ -32,16 +38,16 @@ export class RestaurantesComponent {
   isAdmin = false;
   constructor(private appService: AppService, private dialog: MatDialog) {
 
-    this.appService.verifyAdmin().subscribe(
-      (response: any) => {
+    this.appService.verifyAdmin().subscribe({
+      next: (response: any) => {
         this.isAdmin = response.role === 'admin';
 
         console.log(this.isAdmin);
       },
-      (error: any) => {
+      error: (error: any) => {
         console.error('Error verifying admin status:', error);
       }
-    );
+    });
   }
 
   ngOnInit() {
@@ -61,6 +67,12 @@ export class RestaurantesComponent {
         );
       })
     ).subscribe((result) => {
+      if (Array.isArray(result)) {
+        result = result.map((r: any) => ({
+          ...r,
+          logoUrl: `${environment.backendUrl}/documentos/${r.id}/logoPng?cb=${Date.now()}`
+        }));
+      }
       if (result === null) return;
       this.restaurantes = result;
       this.noResults = result.length === 0;
@@ -73,26 +85,169 @@ export class RestaurantesComponent {
 
 
   getRestaurantes() {
-    this.appService.getAfiliacionByGiro('Restaurante').subscribe(
-      (response: any) => {
-        this.restaurantes = response;
-        console.log(this.restaurantes);
-      },
-      (error: any) => {
-        console.error('Error fetching restaurantes:', error);
-      }
-    );
+    this.appService.getAfiliacionByGiro('Restaurante').subscribe(resp => {
+      this.restaurantes = resp.map((r: { id: any; }) => ({
+        ...r,
+        logoUrl: `${environment.backendUrl}/documentos/${r.id}/logoPng?cb=${Date.now()}`
+      }));
+    });
   }
 
   viewRestaurante(id: any) {
-    const restaurantes = this.restaurantes.find(c => c.id === id);
-    if (restaurantes) {
+    const restaurante = this.restaurantes.find(c => c.id === id);
+    if (restaurante) {
+      console.log(restaurante);
       this.dialog.open(RestauranteDialogComponent, {
-        data: restaurantes,
+        data: {
+          ...restaurante,
+          isAdmin: this.isAdmin
+        },
         width: '500px',
-        maxHeight: '90vh'
+        maxHeight: '90vh',
+      }).afterClosed().subscribe(result => {
+        console.log(result);
+        this.getRestaurantes();
       });
     }
+  }
+  viewPolizaDerechos(id: any): void {
+    const restaurante = this.restaurantes.find(c => c.id === id);
+    if (!restaurante) {
+      return;
+    }
+
+    const printContents = `
+      <html>
+        <head>
+          <title>Póliza de derechos</title>
+          <style>
+            @page { margin: 2cm 1cm; }
+            body, html { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+            .content {
+              display: flex;
+              flex-direction: column;
+              margin-top: 250px;
+              line-height:1.4;
+            }
+              p {
+                margin: 0;
+                font-size: 18px;
+              }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div class="content">
+            <p><strong>NUMERO DE PÓLIZA:</strong> ${restaurante.poliza}</p>
+            <p><strong>NUMERO UBICACIÓN PÓLIZA:</strong> ${restaurante.polizaUbicacion}</p>
+            <p><strong>NUMERO CONTROL CER:</strong> ${restaurante.id}</p>
+            <p><strong>RAZÓN SOCIAL DEL RESTAURANTE ASEGURADO:</strong><br>${restaurante.razonSocial}</p>
+            <p><strong>NOMBRE COMERCIAL:</strong> ${restaurante.nombreComercial}</p>
+            <p><strong>DIRECCIÓN DE LA UBICACIÓN (SUCURSAL) ASEGURADA:</strong><br>${restaurante.domicilioSucursal}</p>
+            <p><strong>C.P.:</strong> ${restaurante.codigoPostal}</p>
+            <p>
+              <strong>NUMERO FACTURA AFILIACIÓN:</strong> ${restaurante.numeroFactura}
+              &nbsp;&nbsp;<strong>FECHA DE FACTURA:</strong>
+              ${new Date(restaurante.fechaAfiliacion).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContents);
+      printWindow.document.close();
+    }
+  }
+  async reporteGeneral() {
+
+    const wb = new Workbook();
+    const ws = wb.addWorksheet('Restaurantes');
+
+
+
+    ws.columns = [
+      { header: 'ID', key: 'id', width: 10 },
+
+      { header: 'Razón social', key: 'razonSocial', width: 30 },
+      { header: 'Nombre comercial', key: 'nombreComercial', width: 30 },
+      { header: 'Giro', key: 'giro', width: 20 },
+      { header: 'Subgiro', key: 'subgiro', width: 20 },
+      { header: 'Página Web', key: 'paginaWeb', width: 30 },
+      { header: 'Facebook', key: 'facebook', width: 30 },
+      { header: 'Instagram', key: 'instagram', width: 30 },
+      { header: 'Google Maps', key: 'googleMaps', width: 30 },
+
+      { header: 'Nombre del propietario', key: 'nombrePropietario', width: 30 },
+      { header: 'Teléfono del propietario', key: 'telefonoPropietario', width: 20 },
+      { header: 'Email del propietario', key: 'emailPropietario', width: 30 },
+      { header: 'Fecha de nacimiento del propietario', key: 'fechaNacimientoPropietario', width: 20 },
+
+      { header: 'Nombre del gerente', key: 'nombreGerente', width: 30 },
+      { header: 'Teléfono del gerente', key: 'telefonoGerente', width: 20 },
+      { header: 'Email del gerente', key: 'emailGerente', width: 30 },
+      { header: 'Fecha de nacimiento del gerente', key: 'fechaNacimientoGerente', width: 20 },
+
+      { header: 'Domicilio fiscal', key: 'domicilioFiscal', width: 40 },
+      { header: 'Domicilio de sucursal', key: 'domicilioSucursal', width: 40 },
+      { header: 'Código postal', key: 'codigoPostal', width: 15 },
+      { header: 'RFC', key: 'rfc', width: 20 },
+      { header: 'Teléfono Oficina', key: 'telefonoOficina', width: 20 },
+      { header: 'Fecha de alta', key: 'fechaAlta', width: 20 },
+      { header: 'Fecha de afiliación', key: 'fechaAfiliacion', width: 20 },
+      { header: 'Fecha de vencimiento', key: 'fechaVencimiento', width: 20 },
+      { header: 'Póliza', key: 'poliza', width: 20 },
+      { header: 'Ubicación póliza', key: 'polizaUbicacion', width: 15 },
+      { header: 'Número de factura', key: 'numeroFactura', width: 15 },
+      { header: 'Importe de factura', key: 'importeFactura', width: 15 },
+
+      { header: 'Activo', key: 'isActive', width: 10 },
+      { header: 'URL Logo', key: 'logoUrl', width: 40 }
+    ];
+
+
+    this.restaurantes.forEach(r => {
+      ws.addRow({
+        ...r,
+
+        fechaNacimientoPropietario: this.formatDate(r.fechaNacimientoPropietario),
+        fechaNacimientoGerente: this.formatDate(r.fechaNacimientoGerente),
+        fechaAlta: this.formatDate(r.fechaAlta),
+        fechaAfiliacion: this.formatDate(r.fechaAfiliacion),
+        fechaVencimiento: this.formatDate(r.fechaVencimiento),
+        createdAt: this.formatDateTime(r.createdAt),
+        updatedAt: this.formatDateTime(r.updatedAt),
+        isActive: r.isActive ? 'Sí' : 'No'
+      });
+    });
+
+
+    ws.getRow(1).font = { bold: true };
+
+
+    const buf = await wb.xlsx.writeBuffer();
+    const blob = new Blob([buf], { type: 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `reporte_restaurantes_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
+  private formatDate(d: any): string {
+    return d
+      ? new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' })
+      : '';
+  }
+
+  private formatDateTime(d: any): string {
+    return d
+      ? new Date(d).toLocaleString('es-MX', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      })
+      : '';
   }
 }
 
@@ -107,218 +262,322 @@ export class RestaurantesComponent {
 
 
 
+interface Giro { name: string; subgiros: { name: string }[] }
 interface Documento {
-  key: string;
-  label: string;
-  url: string;
-  inline: boolean;
-  file?: File;
+  key: string; label: string; url: string; inline: boolean; file?: File;
 }
 @Component({
   selector: 'app-restaurantes-dialog',
   standalone: true,
   imports: [CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
     MatDividerModule,
     MatCardModule,
-    MatIconModule],
+    MatSelectModule,
+    MatIconModule,
+    MatDatepickerModule
+  ],
   template: `
-    <mat-dialog-content class="dialog-content">
+    <form [formGroup]="form" class="dialog-form" (ngSubmit)="onSubmit()">
+  <mat-dialog-content class="dialog-content">
 
-  <!-- GENERAL -->
-  <section class="section">
-    <h3>Datos generales</h3>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Razón social</mat-label>
-        <input matInput [(ngModel)]="data.razonSocial" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Nombre comercial</mat-label>
-        <input matInput [(ngModel)]="data.nombreComercial" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Giro</mat-label>
-        <input matInput [(ngModel)]="data.giro" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Subgiro</mat-label>
-        <input matInput [(ngModel)]="data.subgiro" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Página web</mat-label>
-        <input matInput [(ngModel)]="data.paginaWeb" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Facebook</mat-label>
-        <input matInput [(ngModel)]="data.facebook" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Instagram</mat-label>
-        <input matInput [(ngModel)]="data.instagram" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-  </section>
+    <!-- DATOS GENERALES -->
+    <section>
+      <h3>Datos generales</h3>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Razón social</mat-label>
+          <input matInput formControlName="razonSocial" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['razonSocial'].invalid && f['razonSocial'].touched">
+            Razón social es obligatoria
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Nombre comercial</mat-label>
+          <input matInput formControlName="nombreComercial" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['nombreComercial'].invalid && f['nombreComercial'].touched">
+            Nombre comercial es obligatorio
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <!-- GIRO -->
+          <mat-form-field appearance="fill">
+          <mat-label>Giro</mat-label>
+          <mat-select formControlName="giro" (selectionChange)="onGiroChange($event.value)" [disabled]="!isAdmin">
+            <mat-option *ngFor="let g of giros" [value]="g">{{ g.name }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="f['giro'].invalid && f['giro'].touched">Giro es obligatorio</mat-error>
+        </mat-form-field>
 
-  <mat-divider></mat-divider>
+        <!-- SUBGIRO -->
+        <mat-form-field appearance="fill">
+          <mat-label>Subgiro</mat-label>
+          <mat-select formControlName="subgiro" [disabled]="!isAdmin || !subgiros.length">
+            <mat-option *ngFor="let s of subgiros" [value]="s">{{ s.name }}</mat-option>
+          </mat-select>
+          <mat-error *ngIf="f['subgiro'].invalid && f['subgiro'].touched">Subgiro es obligatorio</mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Página Web</mat-label>
+          <input matInput formControlName="paginaWeb" [disabled]="!isAdmin">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Facebook</mat-label>
+          <input matInput formControlName="facebook" [disabled]="!isAdmin">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Instagram</mat-label>
+          <input matInput formControlName="instagram" [disabled]="!isAdmin">
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Google Maps</mat-label>
+          <input matInput formControlName="googleMaps" [disabled]="!isAdmin">
+        </mat-form-field>
+      </div>
+    </section>
 
-  <!-- PROPIETARIO -->
-  <section class="section">
-    <h3>Datos del propietario</h3>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Nombre</mat-label>
-        <input matInput [(ngModel)]="data.nombrePropietario" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Teléfono</mat-label>
-        <input matInput [(ngModel)]="data.telefonoPropietario" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Email</mat-label>
-        <input matInput [(ngModel)]="data.emailPropietario" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Fecha de nacimiento</mat-label>
-        <input matInput type="date" [(ngModel)]="data.fechaNacimientoPropietario" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-  </section>
+    <mat-divider></mat-divider>
 
-  <mat-divider></mat-divider>
+    <!-- DATOS DEL PROPIETARIO -->
+    <section>
+      <h3>Datos del propietario</h3>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Nombre de; propietario</mat-label>
+          <input matInput formControlName="nombrePropietario" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['nombrePropietario'].invalid && f['nombrePropietario'].touched">
+            Nombre de; propietario es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Teléfono del propietario</mat-label>
+          <input matInput formControlName="telefonoPropietario" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['telefonoPropietario'].invalid && f['telefonoPropietario'].touched">
+            Teléfono del propietario es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Email del propietario</mat-label>
+          <input matInput formControlName="emailPropietario" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['emailPropietario'].invalid && f['emailPropietario'].touched">
+            Email del propietario inválido
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Fecha de nacimiento del propietario</mat-label>
+          <input matInput [matDatepicker]="pickerFechaNacimientoPropietario" formControlName="fechaNacimientoPropietario" [disabled]="!isAdmin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFechaNacimientoPropietario"></mat-datepicker-toggle>
+          <mat-datepicker  icker #pickerFechaNacimientoPropietario></mat-datepicker>
+          <mat-error *ngIf="f['fechaNacimientoPropietario'].invalid && f['fechaNacimientoPropietario'].touched">
+            Fecha de nacimiento del propietario es obligatoria
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </section>
 
-  <!-- GERENTE -->
-  <section class="section">
-    <h3>Datos del gerente</h3>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Nombre</mat-label>
-        <input matInput [(ngModel)]="data.nombreGerente" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Teléfono</mat-label>
-        <input matInput [(ngModel)]="data.telefonoGerente" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Email</mat-label>
-        <input matInput [(ngModel)]="data.emailGerente" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Fecha de nacimiento</mat-label>
-        <input matInput type="date" [(ngModel)]="data.fechaNacimientoGerente" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-  </section>
+    <mat-divider></mat-divider>
 
-  <mat-divider></mat-divider>
+    <!-- DATOS DEL GERENTE -->
+    <section>
+      <h3>Datos del gerente</h3>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Nombre del gerente</mat-label>
+          <input matInput formControlName="nombreGerente" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['nombreGerente'].invalid && f['nombreGerente'].touched">
+            Nombre del gerente es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Teléfono del gerente</mat-label>
+          <input matInput formControlName="telefonoGerente" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['telefonoGerente'].invalid && f['telefonoGerente'].touched">
+            Teléfono del gerente es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Email del gerente</mat-label>
+          <input matInput formControlName="emailGerente" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['emailGerente'].invalid && f['emailGerente'].touched">
+            Email del gerente inválido
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Fecha de nacimiento del gerente</mat-label>
+          <input matInput [matDatepicker]="pickerFechaNacimientoGerente" formControlName="fechaNacimientoGerente" [disabled]="!isAdmin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFechaNacimientoGerente"></mat-datepicker-toggle>
+          <mat-datepicker  icker #pickerFechaNacimientoGerente></mat-datepicker>
+          <mat-error *ngIf="f['fechaNacimientoGerente'].invalid && f['fechaNacimientoGerente'].touched">
+            Fecha de nacimiento del gerente es obligatoria
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </section>
 
-  <!-- FACTURACIÓN / PÓLIZA -->
-  <section class="section">
-    <h3>Facturación y póliza</h3>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Código postal</mat-label>
-        <input matInput [(ngModel)]="data.codigoPostal" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>RFC</mat-label>
-        <input matInput [(ngModel)]="data.rfc" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Teléfono de oficina</mat-label>
-        <input matInput [(ngModel)]="data.telefonoOficina" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Fecha de alta</mat-label>
-        <input matInput type="date" [(ngModel)]="data.fechaAlta" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Fecha de afiliación</mat-label>
-        <input matInput type="date" [(ngModel)]="data.fechaAfiliacion" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Fecha de vencimiento</mat-label>
-        <input matInput type="date" [(ngModel)]="data.fechaVencimiento" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Póliza</mat-label>
-        <input matInput [(ngModel)]="data.poliza" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Ubicación de póliza</mat-label>
-        <input matInput [(ngModel)]="data.polizaUbicacion" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-    <div class="row">
-      <mat-form-field appearance="fill">
-        <mat-label>Número de factura</mat-label>
-        <input matInput type="number" [(ngModel)]="data.numeroFactura" [readonly]="isAdmin">
-      </mat-form-field>
-      <mat-form-field appearance="fill">
-        <mat-label>Importe de factura</mat-label>
-        <input matInput type="number" [(ngModel)]="data.importeFactura" [readonly]="isAdmin">
-      </mat-form-field>
-    </div>
-  </section>
+    <mat-divider></mat-divider>
 
-  <mat-divider></mat-divider>
+    <!-- FACTURACIÓN Y PÓLIZA -->
+    <section>
+      <h3>Facturación y póliza</h3>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Domicilio fiscal</mat-label>
+          <input matInput formControlName="domicilioFiscal" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['domicilioFiscal'].invalid && f['domicilioFiscal'].touched">
+            Domicilio fiscal es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Domicilio de sucursal</mat-label>
+          <input matInput formControlName="domicilioSucursal" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['domicilioSucursal'].invalid && f['domicilioSucursal'].touched">
+            Domicilio de sucursal es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Código postal</mat-label>
+          <input matInput formControlName="codigoPostal" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['codigoPostal'].invalid && f['codigoPostal'].touched">
+            Código postal es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>RFC</mat-label>
+          <input matInput formControlName="rfc" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['rfc'].invalid && f['rfc'].touched">
+            RFC inválido
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Teléfono Oficina</mat-label>
+          <input matInput formControlName="telefonoOficina" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['telefonoOficina'].invalid && f['telefonoOficina'].touched">
+            Teléfono de oficina es obligatorio
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Fecha de alta</mat-label>
+          <input matInput [matDatepicker]="pickerFechaAlta" formControlName="fechaAlta" [disabled]="true">
+          <mat-datepicker-toggle matSuffix [for]="pickerFechaAlta"></mat-datepicker-toggle>
+          <mat-datepicker  icker #pickerFechaAlta></mat-datepicker>
+          <mat-error *ngIf="f['fechaAlta'].invalid && f['fechaAlta'].touched">
+            Fecha de alta es obligatoria
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Fecha de afiliación</mat-label>
 
-<section class="section docs-section" *ngIf="documentos.length">
-  <h3>Documentos</h3>
-  <mat-card *ngFor="let doc of documentos" class="doc-item">
-    <mat-card-title>{{ doc.label }}</mat-card-title>
-    <mat-card-content class="doc-content">
-      <!-- VER DOCUMENTO -->
-      <button mat-button color="accent" (click)="verDocumento(doc)">
-        <mat-icon>visibility</mat-icon>
-        Ver
-      </button>
+          <input matInput [matDatepicker]="pickerFechaAfiliacion" formControlName="fechaAfiliacion" [disabled]="!isAdmin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFechaAfiliacion"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFechaAfiliacion></mat-datepicker>
+          <mat-error *ngIf="f['fechaAfiliacion'].invalid && f['fechaAfiliacion'].touched">
+            Fecha de afiliación es obligatoria
+          </mat-error>
+        </mat-form-field>
 
-      <!-- SUBIR / REEMPLAZAR DOCUMENTO (solo admin) con validación -->
-      <input
-        type="file"
-        #fileInput
-        hidden
-        (change)="onFileSelected($event, doc.key)"
-        [attr.accept]="acceptTypesFor(doc.key)"
-      />
-      <button
-        mat-stroked-button
-        color="primary"
-        type="button"
-        [disabled]="isAdmin"
-        (click)="fileInput.click()"
-      >
-        <mat-icon style="margin-right:6px">upload</mat-icon>
-        {{ doc.file ? 'Cambiar archivo' : 'Subir archivo' }}
-      </button>
 
-      <!-- Nombre del archivo seleccionado -->
-      <p *ngIf="doc.file" class="archivo-nombre">
-        Archivo seleccionado: {{ doc.file.name }}
-      </p>
-    </mat-card-content>
-  </mat-card>
-</section>
 
-</mat-dialog-content>
+        <mat-form-field appearance="fill">
+          <mat-label>Fecha de vencimiento</mat-label>
+          <input matInput [matDatepicker]="pickerFechaVencimiento" formControlName="fechaVencimiento" [disabled]="!isAdmin">
+          <mat-datepicker-toggle matSuffix [for]="pickerFechaVencimiento"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFechaVencimiento></mat-datepicker>
+          <mat-error *ngIf="f['fechaVencimiento'].invalid && f['fechaVencimiento'].touched">
+            Fecha de vencimiento es obligatoria
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Póliza</mat-label>
+          <input matInput formControlName="poliza" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['poliza'].invalid && f['poliza'].touched">
+            Póliza es obligatoria
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Ubicación póliza</mat-label>
+          <input matInput formControlName="polizaUbicacion" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['polizaUbicacion'].invalid && f['polizaUbicacion'].touched">
+            Ubicación póliza es obligatoria
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="row">
+        <mat-form-field appearance="fill">
+          <mat-label>Número de factura</mat-label>
+          <input matInput type="number" formControlName="numeroFactura" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['numeroFactura'].invalid && f['numeroFactura'].touched">
+            Número de factura es obligatorio
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="fill">
+          <mat-label>Importe de factura</mat-label>
+          <input matInput type="number" formControlName="importeFactura" [disabled]="!isAdmin">
+          <mat-error *ngIf="f['importeFactura'].invalid && f['importeFactura'].touched">
+            Importe de factura es obligatorio
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </section>
 
-<mat-dialog-actions align="end">
-  <button mat-button (click)="dialogRef.close()">Cerrar</button>
-  <button mat-button color="primary" *ngIf="!isAdmin" (click)="onSave()">Guardar</button>
-</mat-dialog-actions>
+    <mat-divider></mat-divider>
+
+    <!-- DOCUMENTOS -->
+    <section *ngIf="documentos.length">
+      <h3>Documentos</h3>
+      <mat-card *ngFor="let doc of documentos" class="doc-item">
+        <mat-card-title>{{ doc.label }}</mat-card-title>
+        <mat-card-content class="doc-content">
+          <button mat-button color="accent" (click)="verDocumento(doc)">
+            <mat-icon>visibility</mat-icon> Ver
+          </button>
+          <input
+            type="file"
+            #fileInput
+            hidden
+            (change)="onFileSelected($event, doc.key)"
+            [attr.accept]="acceptTypesFor(doc.key)"
+          />
+          <button
+            mat-stroked-button
+            color="primary"
+            type="button"
+            [disabled]="!isAdmin"
+            (click)="fileInput.click()"
+          >
+            <mat-icon>upload</mat-icon>
+            {{ doc.file ? 'Cambiar archivo' : 'Subir archivo' }}
+          </button>
+          <p *ngIf="doc.file" class="archivo-nombre">
+            Archivo: {{ doc.file.name }}
+          </p>
+        </mat-card-content>
+      </mat-card>
+    </section>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button type="button" mat-button (click)="dialogRef.close()">Cerrar</button>
+    <button
+      mat-button
+      color="primary"
+      type="submit"
+      [disabled]="form.invalid || !isAdmin"
+    >
+      Guardar
+    </button>
+  </mat-dialog-actions>
+</form>
+
 
   `,
   styles: [`
@@ -337,129 +596,221 @@ interface Documento {
 
 
 
-export class RestauranteDialogComponent {
-
+export class RestauranteDialogComponent implements OnInit {
+  form!: FormGroup;
+  giros: Giro[] = [];
+  subgiros: { name: string }[] = [];
   documentos: Documento[] = [];
   isAdmin: boolean;
-  private fileConstraints: Record<string, { maxSize: number; types: string[] }> = {
-    logoPng: { maxSize: 2 * 1024 * 1024, types: ['image/png'] },
-    logoPdf: { maxSize: 2 * 1024 * 1024, types: ['application/pdf'] },
-    default: { maxSize: 2 * 1024 * 1024, types: ['image/*', 'application/pdf'] }
-  };
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    public dialogRef: MatDialogRef<RestauranteDialogComponent>,
-    private snackBar: MatSnackBar
-  ) {
-    this.isAdmin = data.isAdmin;
 
-    const backend = environment.backendUrl;
-    const id = data.id;
-    const docKeys = [
-      'comprobanteSucursal',
-      'comprobanteMatriz',
-      'ine',
-      'csf',
-      'logoPdf',
-      'logoPng'
-    ];
 
-    this.documentos = docKeys.map(key => ({
-      key,
-      label: this.toLabel(key),
-      url: `${backend}/documentos/${id}/${key}`,
-      inline: key === 'logoPng',
-      file: undefined
-    }));
+
+
+
+  onGiroChange(selectedGiro: any): void {
+    this.subgiros = selectedGiro ? selectedGiro.subgiros : [];
+    this.form.get('subgiro')?.reset();
   }
 
+  private fileConstraints: Record<string, { maxSize: number; types: string[] }> = {
+    logoPng: { maxSize: 2 << 20, types: ['image/png'] },
+    logoPdf: { maxSize: 2 << 20, types: ['application/pdf'] },
+    default: { maxSize: 2 << 20, types: ['image/*', 'application/pdf'] }
+  };
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private fb: FormBuilder,
+    private snackBar: MatSnackBar,
+    public dialogRef: MatDialogRef<RestauranteDialogComponent>,
+    private appService: AppService
+  ) {
+    this.isAdmin = data.isAdmin;
+    console.log(this.isAdmin);
+    this.loadGiros();
+  }
+
+
+
+  private loadGiros() {
+    this.appService.getGiros().subscribe({
+      next: resp => {
+
+        const map = new Map<string, Giro>();
+        resp.forEach((item: { giro: string; subgiro: any; }) => {
+          if (!map.has(item.giro)) {
+            map.set(item.giro, { name: item.giro, subgiros: [] });
+          }
+          map.get(item.giro)!.subgiros.push({ name: item.subgiro });
+        });
+        this.giros = Array.from(map.values());
+
+
+        const selGiro = this.giros.find(g => g.name === this.data.giro) || null;
+        this.form.get('giro')!.setValue(selGiro);
+        this.subgiros = selGiro ? selGiro.subgiros : [];
+
+
+        const selSub = this.subgiros.find(s => s.name === this.data.subgiro) || null;
+        this.form.get('subgiro')!.setValue(selSub);
+      },
+      error: err => {
+        console.error('Error cargando giros', err);
+        this.snackBar.open('No se pudieron cargar los giros', 'Cerrar', { duration: 3000 });
+      }
+    });
+  }
+  ngOnInit() {
+    this.form = this.fb.group({
+      razonSocial: [this.data.razonSocial, Validators.required],
+      nombreComercial: [this.data.nombreComercial, Validators.required],
+      giro: [null, Validators.required],
+      subgiro: [null, Validators.required],
+      paginaWeb: [this.data.paginaWeb],
+      facebook: [this.data.facebook],
+      instagram: [this.data.instagram],
+      googleMaps: [this.data.googleMaps],
+      nombrePropietario: [this.data.nombrePropietario, Validators.required],
+      telefonoPropietario: [this.data.telefonoPropietario, Validators.required],
+      emailPropietario: [this.data.emailPropietario, [Validators.required, Validators.email]],
+      fechaNacimientoPropietario: [this.data.fechaNacimientoPropietario, Validators.required],
+      nombreGerente: [this.data.nombreGerente, Validators.required],
+      telefonoGerente: [this.data.telefonoGerente, Validators.required],
+      emailGerente: [this.data.emailGerente, [Validators.required, Validators.email]],
+      fechaNacimientoGerente: [this.data.fechaNacimientoGerente, Validators.required],
+      domicilioFiscal: [this.data.domicilioFiscal, Validators.required],
+      domicilioSucursal: [this.data.domicilioSucursal, Validators.required],
+      codigoPostal: [this.data.codigoPostal, Validators.required],
+      rfc: [this.data.rfc, [Validators.required, Validators.pattern(/^([A-ZÑ&]{3,4}) ?-?([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01]) ?-?([A-Z\d]{3})$/i)]],
+      telefonoOficina: [this.data.telefonoOficina, Validators.required],
+      fechaAlta: [{ value: this.data.fechaAlta, disabled: true }, Validators.required],
+      fechaAfiliacion: [this.data.fechaAfiliacion, Validators.required],
+      fechaVencimiento: [this.data.fechaVencimiento, Validators.required],
+      poliza: [this.data.poliza, Validators.required],
+      polizaUbicacion: [this.data.polizaUbicacion, Validators.required],
+      numeroFactura: [this.data.numeroFactura, Validators.required],
+      importeFactura: [this.data.importeFactura, Validators.required],
+
+
+      comprobanteSucursal: [null],
+      comprobanteMatriz: [null],
+      ine: [null],
+      csf: [null],
+      logoPdf: [null],
+      logoPng: [null]
+
+    });
+
+    const backend = environment.backendUrl;
+    const id = this.data.id;
+    ['comprobanteSucursal', 'comprobanteMatriz', 'ine', 'csf', 'logoPdf', 'logoPng']
+      .forEach(key => this.documentos.push({
+        key,
+        label: this.toLabel(key),
+        url: `${backend}/documentos/${id}/${key}`,
+        inline: key === 'logoPng'
+      }));
+
+    if (!this.isAdmin) {
+      this.form.disable();
+    }
+  }
+
+  get f() { return this.form.controls; }
+
   toLabel(key: string): string {
-    const map: Record<string, string> = {
-      comprobanteSucursal: 'Comprobante de sucursal',
-      comprobanteMatriz: 'Comprobante de matriz',
+    return {
+      comprobanteSucursal: 'Comprobante sucursal',
+      comprobanteMatriz: 'Comprobante matriz',
       ine: 'INE',
-      csf: 'Constancia de situación fiscal',
+      csf: 'Constancia Fiscal',
       logoPdf: 'Logo (PDF)',
       logoPng: 'Logo (PNG)'
-    };
-    return map[key] || key;
+    }[key] || key;
+  }
+
+  acceptTypesFor(key: string): string {
+    return (this.fileConstraints[key] || this.fileConstraints['default'])
+      .types.join(',');
+  }
+
+  onFileSelected(ev: Event, controlName: string) {
+    const input = ev.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    const { maxSize, types } = this.fileConstraints[controlName] ?? this.fileConstraints['default'];
+
+    if (file.size > maxSize) {
+      this.snackBar.open(`"${file.name}" excede ${(maxSize / 1e6).toFixed(0)} MB.`, 'Cerrar', { duration: 3000 });
+      input.value = ''; return;
+    }
+    const valid = types.some(t => t.endsWith('/*') ? file.type.startsWith(t.slice(0, -1)) : file.type === t);
+    if (!valid) {
+      this.snackBar.open(`Tipo no permitido: ${types.join(', ')}`, 'Cerrar', { duration: 3000 });
+      input.value = ''; return;
+    }
+    const doc = this.documentos.find(d => d.key === controlName)!;
+    doc.file = file;
+
+    this.form.get(controlName)!.setValue(input.files[0]);
+    console.log(`Archivo "${file.name}" seleccionado para ${controlName}`);
   }
 
   verDocumento(doc: Documento) {
     window.open(doc.url, '_blank');
   }
 
-  acceptTypesFor(controlName: string): string {
-    const constraint = this.fileConstraints[controlName] ?? this.fileConstraints['default'];
+  onSubmit() {
+    if (this.form.invalid) {
+      console.log(
+        'Formulario inválido:', this.form.errors
+      ); return;
+    };
+    this.form.updateValueAndValidity();
 
-    return constraint.types.join(',');
-  }
+    console.log('RAW FORM VALUES:', this.form.getRawValue());
 
-  onFileSelected(event: Event, controlName: string): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-
-    const file = input.files[0];
-    const { maxSize, types } = this.fileConstraints[controlName] ?? this.fileConstraints['default'];
-
-
-    if (file.size > maxSize) {
-      this.snackBar.open(
-        `“${file.name}” excede ${(maxSize / 1024 / 1024).toFixed(1)} MB.`,
-        'Cerrar',
-        { duration: 3000 }
-      );
-      input.value = '';
+    if (!this.form.valid) {
+      console.warn('Formulario inválido');
       return;
     }
 
-
-    const validType: boolean = types.some((allowed: string): boolean => {
-      if (allowed.endsWith('/*')) {
-        return file.type.startsWith(allowed.slice(0, -1));
-      }
-      return file.type === allowed;
-    });
-    if (!validType) {
-      this.snackBar.open(
-        `Tipo no permitido para “${this.toLabel(controlName)}”. Permitted: ${types.join(', ')}`,
-        'Cerrar',
-        { duration: 3000 }
-      );
-      input.value = '';
-      return;
+    const formData = new FormData();
+    const raw = this.form.getRawValue();
+    if (typeof raw.giro === 'object' && raw.giro.name) {
+      raw.giro = raw.giro.name;
     }
-
-
-    const doc = this.documentos.find(d => d.key === controlName);
-    if (doc) {
-      doc.file = file;
-      console.log('Nuevo archivo listo para subir:', controlName, file);
+    if (typeof raw.subgiro === 'object' && raw.subgiro.name) {
+      raw.subgiro = raw.subgiro.name;
     }
-  }
-  onFileChange(event: Event, key: string) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-
-    const file = input.files[0];
-    const doc = this.documentos.find(d => d.key === key);
-    if (doc) {
-      doc.file = file;
-
-
-      console.log('Nuevo archivo para', key, file);
-    }
-  }
-
-  onSave() {
-
-
-    this.documentos.forEach(doc => {
-      if (doc.file) {
-
-        console.log('Subir', doc.key, doc.file);
+    Object.entries(raw).forEach(([key, value]) => {
+      if (value instanceof Blob) {
+        formData.append(key, value);
+      } else {
+        formData.append(key, value != null ? value.toString() : '');
       }
     });
-    this.dialogRef.close({ ...this.data, documentos: this.documentos });
+
+
+    const debug: Array<{ key: string; value: any }> = [];
+    formData.forEach((value, key) => {
+      debug.push({ key, value });
+    });
+    console.log('FormData que se va a enviar:', debug);
+
+    this.appService.updateAfiliacion(this.data.id, formData).subscribe({
+      next: (resp) => {
+        console.log('Éxito:', resp);
+        this.snackBar.open('Afiliación creada exitosamente', 'Cerrar', { duration: 3000 });
+        this.form.reset();
+      },
+      error: (err) => {
+        console.error('Error al crear la afiliación:', err);
+
+      }
+    });
+    this.dialogRef.close({ ...this.form.value, documentos: this.documentos });
   }
 }
+
+

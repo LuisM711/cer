@@ -7,20 +7,27 @@
         matInput />
 
 </header>
-<div style="min-height: 90vh;">
+<div style="min-height: 90vh;text-align: center;margin-top: 20px;">
     <p *ngIf="noResults" class="no-results">No se encontraron resultados.</p>
 
+    <button type="button" mat-raised-button color="primary" (click)="reporteGeneral()">
+        <img src="/assets/logos/excel.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
+        Descargar reporte general
+    </button>
     <table style="width: 100%; border-collapse: collapse; margin-top: 20px;" class="table-striped">
         <tbody>
             <tr *ngFor="let restaurante of restaurantes">
                 <td>
-                    <img [src]="environment.backendUrl + '/documentos/' + restaurante.id + '/logoPng'"
-                        alt="{{ restaurante.nombreComercial }}" style="height: 50px;">
+                    <img [src]="restaurante.logoUrl" alt="{{ restaurante.nombreComercial }}" style="height:50px">
                 </td>
                 <td>{{ restaurante.nombreComercial }}</td>
-                <td>
+                <td style="display: flex;justify-content: center;align-items: center;gap: 20px;">
                     <button type="button" mat-raised-button color="primary" (click)="viewRestaurante(restaurante.id)">
                         <mat-icon>visibility</mat-icon>Ver detalles
+                    </button>
+                    <button type="button" mat-raised-button color="primary"
+                        (click)="viewPolizaDerechos(restaurante.id)">
+                        <mat-icon>print</mat-icon>Derechos de póliza
                     </button>
                 </td>
             </tr>

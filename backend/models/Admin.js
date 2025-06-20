@@ -1,8 +1,8 @@
-//Admin.js
-const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../database.js');
+// /models/Admin.js
+const { Model, DataTypes } = require('sequelize')
+const sequelize = require('../database.js')
 
-class Admin extends Model { }
+class Admin extends Model {}
 Admin.init({
     id: {
         type: DataTypes.INTEGER,
@@ -26,23 +26,46 @@ Admin.init({
         type: DataTypes.STRING,
         allowNull: true
     },
+    tipo: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
     isActive: {
         type: DataTypes.BOOLEAN,
         defaultValue: true
-    },
+    }
 }, {
-
-    hooks: {
-        afterSync: async () => {
-            await Admin.findOrCreate({
-                where: { nombre: "Luis Mario Lopez", email: 'luismario.lr46@gmail.com', password: 'Luis1234', telefono: '1234567890', isActive: true },
-            });
-        }
-    },
-
     sequelize,
     modelName: 'Admin',
     tableName: 'admins',
-    timestamps: true
-});
-module.exports = Admin;
+    timestamps: true,
+    hooks: {
+        afterSync: async () => {
+            // usuario admin de prueba
+            await Admin.findOrCreate({
+                where: { email: 'luismario.lr46@gmail.com' },
+                defaults: {
+                    nombre: 'Luis Mario Lopez',
+                    password: 'Luis1234',
+                    telefono: '1234567890',
+                    tipo: 'admin',
+                    isActive: true
+                }
+            })
+
+            // usuario operador de prueba
+            await Admin.findOrCreate({
+                where: { email: 'operador@test.com' },
+                defaults: {
+                    nombre: 'Operador Test',
+                    password: 'Operador1234',
+                    telefono: '0987654321',
+                    tipo: 'operador',
+                    isActive: true
+                }
+            })
+        }
+    }
+})
+
+module.exports = Admin

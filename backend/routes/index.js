@@ -13,14 +13,15 @@ module.exports = () => {
         return res.json({ message: 'Bienvenido a la API' });
     });
 
-    router.post('/afiliaciones', verification.verifyAdmin, afiliacionController.createAfiliacion);
-    router.get('/afiliaciones', verification.verifyAdmin, afiliacionController.getAfiliaciones);
-    router.get('/afiliaciones/:id', verification.verifyAdmin, afiliacionController.getAfiliacionById);
-
-    router.get('/afiliaciones/giro/:giro', verification.verifyAdmin, afiliacionController.getAfiliacionByGiro);
+    router.post('/afiliaciones', verification.verifyToken, afiliacionController.createAfiliacion);
+    router.get('/afiliaciones', verification.verifyToken, afiliacionController.getAfiliaciones);
+    router.get('/afiliaciones/:id', verification.verifyToken, afiliacionController.getAfiliacionById);
+    
+    router.put('/afiliaciones/:id', verification.verifyAdmin, afiliacionController.updateAfiliacion);
+    router.get('/afiliaciones/giro/:giro', verification.verifyToken, afiliacionController.getAfiliacionByGiro);
     router.get('/documentos/:id/:tipo', verification.verifyToken, documentosController.getDocumento);
     router.get('/afiliaciones/nombre/:nombreComercial/:giro', verification.verifyToken, afiliacionController.getAfiliacionPorNombreYGiro);
-    router.get('/birthdays',verification.verifyAdmin,afiliacionController.getBirthdays);
+    router.get('/birthdays',verification.verifyToken,afiliacionController.getBirthdays);
 
     router.post('/crear-admin', verification.verifyAdmin, adminController.createAdmin);
     router.get('/admins', verification.verifyAdmin, adminController.getAdmins);
@@ -36,13 +37,13 @@ module.exports = () => {
     router.get('/getInfo', verification.verifyToken, verification.getInfo);
     router.get('/verifyToken', verification.isLogged);
     router.get('/verifyAdmin', verification.isAdmin);
-    router.get('/verifyAfiliado', verification.isAfiliado);
+    // router.get('/verifyAfiliado', verification.isAfiliado);
 
     router.get('/mis-datos', afiliacionController.getMiAfiliacion);
 
     //Giros
-    router.get('/giros', verification.verifyAdmin, giroController.getGiros);
-    router.get('/giros/:id', verification.verifyAdmin, giroController.getGiroById);
+    router.get('/giros', verification.verifyToken, giroController.getGiros);
+    router.get('/giros/:id', verification.verifyToken, giroController.getGiroById);
     router.post('/giros', verification.verifyAdmin, giroController.createGiro);
     router.put('/giros/:id', verification.verifyAdmin, giroController.updateGiro);
     router.delete('/giros/:id', verification.verifyAdmin, giroController.deleteGiro);

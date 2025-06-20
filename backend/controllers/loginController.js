@@ -1,6 +1,6 @@
 //loginController.js
 const Admin = require('../models/Admin.js');
-const Afiliacion = require('../models/Afiliacion.js');
+// const Afiliacion = require('../models/Afiliacion.js');
 
 module.exports.login = async (req, res) => {
     try {
@@ -12,12 +12,9 @@ module.exports.login = async (req, res) => {
 
         user = await Admin.findOne({ where: { email } });
         if (user && user.password === password) {
-            role = 'admin';
+            role = user.tipo;
         } else {
-            user = await Afiliacion.findOne({ where: { email } });
-            if (user && user.password === password) {
-                role = 'afiliado';
-            }
+            return res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
         if (!user) {
@@ -25,7 +22,7 @@ module.exports.login = async (req, res) => {
         }
 
         req.session.token = { id: user.id, role };
-        return res.json({ message: 'Login exitoso', role });
+        return res.status(200).json({ message: 'Login exitoso', role });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Error en el login' });

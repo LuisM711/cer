@@ -36,6 +36,7 @@ Giro.init({
                 { giro: "Restaurante", subgiro: "Pizzería" },
                 { giro: "Restaurante", subgiro: "Sushi" },
                 { giro: "Restaurante", subgiro: "Café" },
+                { giro: "Restaurante", subgiro: "Comida china" },
                 { giro: "Restaurante", subgiro: "Tacos" },
                 { giro: "Restaurante", subgiro: "Cocina económica" },
                 { giro: "Restaurante", subgiro: "Mariscos" },

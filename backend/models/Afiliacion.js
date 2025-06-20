@@ -208,7 +208,8 @@ Afiliacion.init({
                     fechaVencimiento: '2026-06-16',
                     poliza: 'POL123456',
                     polizaUbicacion: '1',
-
+                    numeroFactura: 123456,
+                    importeFactura: 1500.00,
                 },
             }),
                 await Afiliacion.findOrCreate({

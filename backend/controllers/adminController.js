@@ -3,7 +3,7 @@ const Admin = require('../models/Admin');
 
 module.exports.createAdmin = async (req, res) => {
     try {
-        const { nombre, email, password, telefono } = req.body;
+        const { nombre, email, password, telefono, tipo } = req.body;
 
         const existingAdmin = await Admin.findOne({ where: { email } });
         if (existingAdmin) {
@@ -13,7 +13,8 @@ module.exports.createAdmin = async (req, res) => {
             nombre,
             email,
             password,
-            telefono
+            telefono,
+            tipo
         });
         return res.status(201).json(newAdmin);
     } catch (error) {

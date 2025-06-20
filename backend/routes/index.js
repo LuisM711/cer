@@ -16,12 +16,22 @@ module.exports = () => {
     router.post('/afiliaciones', verification.verifyToken, afiliacionController.createAfiliacion);
     router.get('/afiliaciones', verification.verifyToken, afiliacionController.getAfiliaciones);
     router.get('/afiliaciones/:id', verification.verifyToken, afiliacionController.getAfiliacionById);
-    
+
     router.put('/afiliaciones/:id', verification.verifyAdmin, afiliacionController.updateAfiliacion);
     router.get('/afiliaciones/giro/:giro', verification.verifyToken, afiliacionController.getAfiliacionByGiro);
     router.get('/documentos/:id/:tipo', verification.verifyToken, documentosController.getDocumento);
     router.get('/afiliaciones/nombre/:nombreComercial/:giro', verification.verifyToken, afiliacionController.getAfiliacionPorNombreYGiro);
-    router.get('/birthdays',verification.verifyToken,afiliacionController.getBirthdays);
+    router.get('/birthdays', verification.verifyToken, afiliacionController.getBirthdays);
+
+    /**
+     * module.exports.actualizarFechaVencimiento = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { fechaVencimiento } = req.body;
+     */
+    router.put('/actualizarFechaVencimiento/:id', verification.verifyAdmin, afiliacionController.actualizarFechaVencimiento);
+
+
 
     router.post('/crear-admin', verification.verifyAdmin, adminController.createAdmin);
     router.get('/admins', verification.verifyAdmin, adminController.getAdmins);
@@ -44,10 +54,9 @@ module.exports = () => {
     //Giros
     router.get('/giros', verification.verifyToken, giroController.getGiros);
     router.get('/giros/:id', verification.verifyToken, giroController.getGiroById);
-    router.post('/giros', verification.verifyAdmin, giroController.createGiro);
-    router.put('/giros/:id', verification.verifyAdmin, giroController.updateGiro);
-    router.delete('/giros/:id', verification.verifyAdmin, giroController.deleteGiro);
-    
+    router.post('/giros', verification.verifyAdmin, giroController.createSubgiro);
+    router.put('/giros/:id', verification.verifyAdmin, giroController.updateSubgiro);
+
 
 
     return router;

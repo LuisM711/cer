@@ -1,4 +1,5 @@
 const Giro = require('../models/Giro.js');
+const Afiliacion = require('../models/Afiliacion.js');
 
 module.exports.getGiros = async (req, res) => {
     try {
@@ -23,7 +24,7 @@ module.exports.getGiroById = async (req, res) => {
     }
 }
 
-module.exports.createGiro = async (req, res) => {
+module.exports.createSubgiro = async (req, res) => {
     try {
         const { giro, subgiro } = req.body;
         if (!giro) {
@@ -37,33 +38,52 @@ module.exports.createGiro = async (req, res) => {
     }
 }
 
-module.exports.updateGiro = async (req, res) => {
+module.exports.updateSubgiro = async (req, res) => {
     try {
+        /**
+         * const { Model, DataTypes } = require('sequelize');
+         const sequelize = require('../database.js');
+         
+         class Giro extends Model { }
+         Giro.init({
+             id: {
+                 type: DataTypes.INTEGER,
+                 primaryKey: true,
+                 autoIncrement: true
+             },
+             giro: {
+                 type: DataTypes.STRING,
+                 allowNull: false,
+                 unique: false
+             },
+             subgiro: {
+                 type: DataTypes.STRING,
+                 allowNull: true,
+                 unique: true
+             }
+         }
+         */
         const { giro, subgiro } = req.body;
-        const updatedGiro = await Giro.update(
-            { giro, subgiro },
-            { where: { id: req.params.id }, returning: true }
-        );
-        if (!updatedGiro[0]) {
+        const giroInstance = await Giro.findByPk(req.params.id);
+        if (!giroInstance) {
             return res.status(404).json({ error: 'Giro no encontrado' });
         }
+        giroInstance.giro = giro;
+        giroInstance.subgiro = subgiro;
+        await giroInstance.save();
+        console.log(giroInstance);
+        
+        await Afiliacion.update(
+            {  subgiro },
+            { where: { giro: giro } }
+        );
+        return res.status(200).json(giroInstance);
+
+
         return res.status(200).json(updatedGiro[1][0]);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Error al actualizar el giro' });
-    }
-}
-
-module.exports.deleteGiro = async (req, res) => {
-    try {
-        const deleted = await Giro.destroy({ where: { id: req.params.id } });
-        if (!deleted) {
-            return res.status(404).json({ error: 'Giro no encontrado' });
-        }
-        return res.status(204).send();
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: 'Error al eliminar el giro' });
     }
 }
 

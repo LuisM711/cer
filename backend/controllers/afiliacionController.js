@@ -161,15 +161,15 @@ module.exports.getBirthdays = async (req, res) => {
         const cruzaAño = fromStr > toStr;
 
         const whereCondition = cruzaAño
-            ? literal(`strftime('%m-%d', fechaNacimiento) >= '${fromStr}' OR strftime('%m-%d', fechaNacimiento) <= '${toStr}'`)
-            : literal(`strftime('%m-%d', fechaNacimiento) BETWEEN '${fromStr}' AND '${toStr}'`);
+            ? literal(`strftime('%m-%d', fechaNacimientoPropietario) >= '${fromStr}' OR strftime('%m-%d', fechaNacimientoPropietario) <= '${toStr}'`)
+            : literal(`strftime('%m-%d', fechaNacimientoPropietario) BETWEEN '${fromStr}' AND '${toStr}'`);
 
         const afiliaciones = await Afiliacion.findAll({
             where: whereCondition
         });
 
         if (afiliaciones.length === 0) {
-            return res.status(404).json({ message: 'No hay cumpleaños en el rango especificado', flag: false });
+            return res.status(204).json({ message: 'No hay cumpleaños en el rango especificado', flag: false });
         }
 
         return res.status(200).json({ data: afiliaciones, flag: true });
@@ -195,5 +195,25 @@ module.exports.getMiAfiliacion = async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Error al obtener la afiliación' });
+    }
+}
+
+module.exports.actualizarFechaVencimiento = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const { fechaVencimiento } = req.body;
+
+        const afiliacion = await Afiliacion.findByPk(id);
+        if (!afiliacion) {
+            return res.status(404).json({ error: 'Afiliación no encontrada' });
+        }
+
+        afiliacion.fechaVencimiento = fechaVencimiento;
+        await afiliacion.save();
+
+        return res.status(200).json({ message: 'Fecha de vencimiento actualizada correctamente', afiliacion });
+    } catch (error) {
+        console.error('Error al actualizar la fecha de vencimiento:', error);
+        return res.status(500).json({ error: 'Error al actualizar la fecha de vencimiento' });
     }
 }

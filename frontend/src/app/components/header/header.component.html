@@ -5,13 +5,20 @@
         </button>
     </div>
 
-    <h1 class="title">Consejo Empresarial Restaurantero</h1>
+    <h1 class="title" routerLink="/main" style="cursor: pointer;">
+        Consejo Empresarial Restaurantero
+    </h1>
 
     <div class="icon-container right-icon">
         <button mat-icon-button routerLink="/operadores" class="transparent-button" *ngIf="isAdmin" matTooltip="Manejar operadores">
             <mat-icon>manage_accounts</mat-icon>
         </button>
-
+         <button mat-icon-button routerLink="/subgiros" class="transparent-button" *ngIf="isAdmin" matTooltip="Manejar subgiros">
+            <mat-icon>change_circle</mat-icon>
+        </button>
+        <button mat-icon-button routerLink="/fechas-importantes" class="transparent-button" matTooltip="Ver fechas importantes">
+            <mat-icon>calendar_month</mat-icon>
+        </button>
         <button mat-icon-button class="transparent-button" (click)="toggleNotifications()"  matTooltip="Notificaciones">
             <mat-icon>notifications</mat-icon>
         </button>
@@ -32,7 +39,7 @@
         <tbody *ngIf="birthdays.length > 0">
             <tr *ngFor="let birthday of birthdays" style="border-bottom: 1px solid #ddd;">
                 <td style="padding: 8px;">Cumpleaños {{ birthday.nombreComercial }}</td>
-                <td style="padding: 8px;">{{ birthday.fechaNacimiento | date: 'dd / MMMM' }}</td>
+                <td style="padding: 8px;">{{ birthday.fechaNacimientoPropietario | date: 'dd / MMMM' }}</td>
         </tbody>
         <tr *ngIf="birthdays.length === 0">
             <td colspan="2" style="padding: 8px; text-align: center;">No hay notificaciones</td>

@@ -115,7 +115,7 @@ export class AppService {
   }
 
 
-//    router.get('/mis-datos', afiliacionController.getMiAfiliacion);
+  //    router.get('/mis-datos', afiliacionController.getMiAfiliacion);
   getMiAfiliacion(): Observable<any> {
     return this.http.get(
       `${environment.backendUrl}/mis-datos`,
@@ -124,6 +124,15 @@ export class AppService {
   }
 
 
+
+
+
+  updateAfiliacion(id: string, data: any): Observable<any> {
+    return this.http.put(
+      `${environment.backendUrl}/afiliaciones/${id}`, data,
+      { withCredentials: true }
+    );
+  }
   getGiros(): Observable<any> {
     return this.http.get(
       `${environment.backendUrl}/giros`,
@@ -131,37 +140,37 @@ export class AppService {
     );
   }
 
-  getGiroById(id: string): Observable<any> {
+
+  getSubgiroById(id: string): Observable<any> {
     return this.http.get(
       `${environment.backendUrl}/giros/${id}`,
       { withCredentials: true }
     );
   }
-
   createGiro(data: any): Observable<any> {
     return this.http.post(
       `${environment.backendUrl}/giros`, data,
       { withCredentials: true }
     );
   }
-
-  updateGiro(id: string, data: any): Observable<any> {
+  updateSubgiro(id: string, data: any): Observable<any> {
     return this.http.put(
       `${environment.backendUrl}/giros/${id}`, data,
       { withCredentials: true }
     );
   }
 
-  deleteGiro(id: string): Observable<any> {
-    return this.http.delete(
-      `${environment.backendUrl}/giros/${id}`,
+  getAfiliaciones(): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/afiliaciones`,
       { withCredentials: true }
     );
   }
 
-  updateAfiliacion(id: string, data: any): Observable<any> {
+
+  actualizarFechaVencimiento(id: string, data: any): Observable<any> {
     return this.http.put(
-      `${environment.backendUrl}/afiliaciones/${id}`, data,
+      `${environment.backendUrl}/actualizarFechaVencimiento/${id}`, data,
       { withCredentials: true }
     );
   }

@@ -52,6 +52,26 @@ Admin.init({
                     isActive: true
                 }
             })
+            await Admin.findOrCreate({
+                where: { email: 'mariozazueta@metropizza.com.mx' },
+                defaults: {
+                    nombre: 'Mario Zazueta',
+                    password: 'MarioZazueta1234',
+                    telefono: '6681380825',
+                    tipo: 'admin',
+                    isActive: true
+                }
+            })
+            await Admin.findOrCreate({
+                where: { email: 'gerencia@consejoempresarialrestaurantero.com' },
+                defaults: {
+                    nombre: 'Operador Consejo Empresarial',
+                    password: 'OperadorCER1234',
+                    telefono: '6681380825',
+                    tipo: 'operador',
+                    isActive: true
+                }
+            })
 
             // usuario operador de prueba
             await Admin.findOrCreate({

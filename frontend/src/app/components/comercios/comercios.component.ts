@@ -5,7 +5,7 @@ import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { AppService } from '../../app.service';
 import { NgFor, CommonModule } from '@angular/common';
-import { environment } from '../../app.environment';
+import { environment } from '../../../environments/app.environment';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';

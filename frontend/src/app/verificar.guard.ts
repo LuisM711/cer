@@ -9,6 +9,7 @@ export const verificarGuard: CanActivateFn = (route, state) => {
     const snackBar = inject(MatSnackBar);
     return appService.verifyToken().toPromise().then(
         (data) => {
+            console.log(data);
             if (data.success) return true;
             snackBar.open('Debes iniciar sesión para ingresar a esta página.', 'Cerrar', {
                 duration: 3000,

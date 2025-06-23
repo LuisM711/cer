@@ -39,7 +39,7 @@ export class LoginComponent {
 
     this.appService.login(loginData).subscribe({
       next: (response) => {
-        console.log('Login successful', response);
+        // console.log('Login successful', response);
         this.router.navigate(['/main']);
 
 

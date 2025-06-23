@@ -1,52 +1,100 @@
-const express = require('express');
-const session = require('express-session');
-const routes = require('./routes');
-const cors = require('cors');
+const fs = require('fs');
 const path = require('path');
+const session = require('express-session');
+const cors = require('cors');
 const fileUpload = require('express-fileupload');
-//const cookieParser = require('cookie-parser');
-//const path = require('path');
-const dotenv = require('dotenv');
+const express = require('express');
+const https = require('https');
+const env = process.env.NODE_ENV || 'development';
+require('dotenv').config({
+  path: path.resolve(__dirname, `.env.${env}`)
+});
+
+const routes = require('./routes');
+const sequelize = require('./database.js');
+
 const app = express();
-app.use(cors({ credentials: true, origin: true }));
-app.use(express.urlencoded({ extended: true,
+
+
+app.use(express.urlencoded({
+  extended: true,
   limit: '50mb',
   parameterLimit: 1000000
+}));
 
- }));
-//const bodyParser = require('body-parser');
-const sequelize = require('./database.js');
-//const morgan = require('morgan');
-//app.use(cookieParser());
-//app.use(morgan('dev'));
+app.use(express.json());
+
 app.use(fileUpload({
   createParentPath: true,
-  limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
+  limits: { fileSize: 50 * 1024 * 1024 },
   abortOnLimit: true,
   responseOnLimit: 'El archivo excede el tamaño máximo permitido de 50 MB'
 }));
-app.use(express.json());
-//app use multer
-//app.use(bodyParser.urlencoded({ extended: true }));
-app.use(session({
-  secret: `${process.env.SECRET}`,
+
+
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'https://proyectomedico.xyz:8001',
+  credentials: true
+}));
+
+
+const sessConfig = {
+  secret: process.env.SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, httpOnly: false, sameSite: 'lax', maxAge: 60000000 },
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: false,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 60000000
+  }
+};
+app.use(session(sessConfig));
 
-}));
-dotenv.config();
+// 4) DESHABILITAR HEADER
 app.disable('x-powered-by');
-sequelize.sync({ force: true }).then(() => {
-  console.log('Base de datos conectada');
-}).catch(error => {
-  console.log('Error al conectar a la base de datos: ' + error.message);
-});
 
-
-// app.use('/documentos', express.static(path.join(__dirname, 'documentos')));
-
+// 5) RUTAS
 app.use('/', routes());
-app.listen(process.env.BACKEND_PORT, () => {
-  console.log(`Servidor escuchando en el puerto ${process.env.BACKEND_PORT}`);
-});
+
+
+sequelize.sync({ force: false })
+  .then(() => {
+    console.log('Base de datos sincronizada sin derribar tablas');
+  })
+  .catch(err => {
+    console.error('❌ Error al sincronizar la BD:', err.name);
+    if (err.name === 'SequelizeValidationError') {
+      err.errors.forEach(e => {
+        console.error(
+          `– [${e.type}] Campo “${e.path}”: ${e.message} (valor: ${e.value})`
+        );
+      });
+    } else {
+      console.error(err);
+    }
+    process.exit(1);
+  });
+
+if (process.env.NODE_ENV === 'development') {
+
+  app.listen(process.env.BACKEND_PORT, () => {
+    console.log(`Servidor escuchando en el puerto ${process.env.BACKEND_PORT}`);
+  });
+}
+else if (process.env.NODE_ENV === 'production') {
+  console.log('Servidor en producción, iniciando HTTPS...');
+
+  const httpsOptions = {
+    key: fs.readFileSync('/etc/letsencrypt/live/proyectomedico.xyz/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/proyectomedico.xyz/fullchain.pem')
+  };
+
+
+  const PORT = process.env.BACKEND_PORT || 8001;
+  https.createServer(httpsOptions, app)
+    .listen(PORT, () => {
+      console.log(`Servidor HTTPS escuchando en puerto ${PORT}`);
+    });
+}

@@ -53,7 +53,7 @@ export class HeaderComponent {
     this.appService.logout().subscribe(
       (response: any) => {
         console.log('Logout successful:', response);
-        window.location.href = '/login';
+        window.location.href = '/';
       },
       (error: any) => {
         console.error('Error during logout:', error);

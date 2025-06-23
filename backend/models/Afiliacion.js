@@ -181,39 +181,40 @@ Afiliacion.init({
             // Por ejemplo, validar datos o formatear campos
         },
         afterSync: async (options) => {
-            await Afiliacion.findOrCreate({
-                where: {
-                    razonSocial: 'Flexi S.A. de C.V.',
-                    nombreComercial: 'Flexi',
-                    giro: 'Comercio',
-                    subgiro: 'Ropa y calzado',
-                    paginaWeb: 'https://www.flexi.com',
-                    facebook: 'https://www.flexi.com/flexi',
-                    googleMaps: 'https://www.google.com/maps/place/flexi',
-                    instagram: 'https://www.instagram.com/flexi',
-                    domicilioFiscal: 'Av. Demo 123, Ciudad, Estado, CP 00000',
-                    domicilioSucursal: 'Av. Demo 123, Ciudad, Estado, CP 00000',
-                    codigoPostal: '81220',
-                    rfc: 'LORL031220DV8',
-                    telefonoOficina: '5550000000',
-                    telefonoPropietario: '5550001111',
-                    nombrePropietario: 'Juan Pérez',
-                    emailPropietario: 'juan.perez@example.com',
-                    fechaNacimientoPropietario: '1980-06-16',
-                    nombreGerente: 'María López',
-                    telefonoGerente: '5550002222',
-                    emailGerente: 'maria.lopez@example.com',
-                    fechaNacimientoGerente: '1985-10-20',
-                    fechaAfiliacion: '2025-06-16',
-                    fechaVencimiento: '2026-06-16',
-                    poliza: 'POL123456',
-                    polizaUbicacion: '1',
-                    numeroFactura: 123456,
-                    importeFactura: 1500.00,
-                },
-            }),
-                await Afiliacion.findOrCreate({
-                    where: {
+            const count = await Afiliacion.count();
+            if (count === 0) {
+                await Afiliacion.bulkCreate([
+                    {
+                        razonSocial: 'Flexi S.A. de C.V.',
+                        nombreComercial: 'Flexi',
+                        giro: 'Comercio',
+                        subgiro: 'Ropa y calzado',
+                        paginaWeb: 'https://www.flexi.com',
+                        facebook: 'https://www.flexi.com/flexi',
+                        googleMaps: 'https://www.google.com/maps/place/flexi',
+                        instagram: 'https://www.instagram.com/flexi',
+                        domicilioFiscal: 'Av. Demo 123, Ciudad, Estado, CP 00000',
+                        domicilioSucursal: 'Av. Demo 123, Ciudad, Estado, CP 00000',
+                        codigoPostal: '81220',
+                        rfc: 'LORL031220DV8',
+                        telefonoOficina: '5550000000',
+                        telefonoPropietario: '5550001111',
+                        nombrePropietario: 'Juan Pérez',
+                        emailPropietario: 'juan.perez@example.com',
+                        fechaNacimientoPropietario: '1980-06-16',
+                        nombreGerente: 'María López',
+                        telefonoGerente: '5550002222',
+                        emailGerente: 'maria.lopez@example.com',
+                        fechaNacimientoGerente: '1985-10-20',
+                        fechaAfiliacion: '2025-06-16',
+                        fechaVencimiento: '2026-06-16',
+                        poliza: 'POL123456',
+                        polizaUbicacion: '1',
+                        numeroFactura: 123456,
+                        importeFactura: 1500.00,
+                    },
+                    {
+
                         razonSocial: 'Chinaloa SA de C.V.',
                         nombreComercial: 'Chinaloa',
                         giro: 'Restaurante',
@@ -243,9 +244,7 @@ Afiliacion.init({
                         importeFactura: 1500.00,
 
                     },
-                }),
-                await Afiliacion.findOrCreate({
-                    where: {
+                    {
                         razonSocial: 'Sushi House S.A. de C.V.',
                         nombreComercial: 'Sushi House - La casa del sushi',
                         giro: 'Restaurante',
@@ -275,9 +274,8 @@ Afiliacion.init({
                         importeFactura: 1500.00,
 
                     },
-                }),
-                await Afiliacion.findOrCreate({
-                    where: {
+                    {
+
                         razonSocial: 'Kita Crudas S.A. de C.V.',
                         nombreComercial: 'Kita-Crudas mariscos',
                         giro: 'Restaurante',
@@ -307,10 +305,10 @@ Afiliacion.init({
                         importeFactura: 1500.00,
 
                     },
-                })
 
+                ], { validate: true });
+            }
         }
     }
 });
-
 module.exports = Afiliacion;

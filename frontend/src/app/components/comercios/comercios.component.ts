@@ -279,7 +279,8 @@ interface Documento {
     MatCardModule,
     MatSelectModule,
     MatIconModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    
   ],
   template: `
     <form [formGroup]="form" class="dialog-form" (ngSubmit)="onSubmit()">
@@ -536,7 +537,7 @@ interface Documento {
       <mat-card *ngFor="let doc of documentos" class="doc-item">
         <mat-card-title>{{ doc.label }}</mat-card-title>
         <mat-card-content class="doc-content">
-          <button mat-button color="accent" (click)="verDocumento(doc)">
+          <button type="button" mat-button color="accent" (click)="verDocumento(doc)">
             <mat-icon>visibility</mat-icon> Ver
           </button>
           <input
@@ -623,7 +624,8 @@ export class ComercioDialogComponent implements OnInit {
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ComercioDialogComponent>,
-    private appService: AppService
+    private appService: AppService,
+    private dialog: MatDialog
   ) {
     this.isAdmin = data.isAdmin;
     console.log(this.isAdmin);
@@ -756,9 +758,25 @@ export class ComercioDialogComponent implements OnInit {
     console.log(`Archivo "${file.name}" seleccionado para ${controlName}`);
   }
 
-  verDocumento(doc: Documento) {
-    window.open(doc.url, '_blank');
-  }
+  async verDocumento(doc: Documento) {
+      try {
+        const res = await fetch(
+          `${environment.backendUrl}/documentos/${this.data.id}/${doc.key}`,
+          { credentials: 'include' }
+        );
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        const blob = await res.blob();
+        console.log('fetch → Blob?', blob instanceof Blob, 'size=', blob.size);
+        const blobUrl = URL.createObjectURL(blob);
+        this.dialog.open(DocumentViewerDialogComponent, {
+          data: { blobUrl, label: doc.label, inline: doc.inline },
+          width: '80vw',
+          height: '80vh'
+        });
+      } catch (err) {
+        console.error('Fetch error:', err);
+      }
+    }
 
   onSubmit() {
     if (this.form.invalid) {
@@ -814,3 +832,44 @@ export class ComercioDialogComponent implements OnInit {
 }
 
 
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
+
+@Component({
+  selector: 'app-document-viewer-dialog',
+  standalone: true,
+  imports: [CommonModule, MatDialogModule, MatButtonModule],
+  template: `
+    <h2 mat-dialog-title>{{ data.label }}</h2>
+    <mat-dialog-content class="dialog-content">
+      <ng-container *ngIf="isPdf; else imageTpl">
+        <iframe [src]="url" width="100%" height="100%"></iframe>
+      </ng-container>
+      <ng-template #imageTpl>
+        <img [src]="url" alt="{{ data.label }}" style="max-width:100%; max-height:100%;" />
+      </ng-template>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cerrar</button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    .dialog-content { height: 80vh; padding: 0; }
+    iframe, img { border: none; }
+  `]
+})
+export class DocumentViewerDialogComponent implements OnInit {
+  url!: SafeResourceUrl;
+  isPdf = false;
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: { blobUrl: string, label: string, inline: boolean },
+    private sanitizer: DomSanitizer
+  ) { }
+
+  ngOnInit() {
+    this.isPdf = !this.data.inline;
+
+    this.url = this.sanitizer.bypassSecurityTrustResourceUrl(this.data.blobUrl);
+  }
+}

@@ -11,7 +11,7 @@ export class AppService {
   constructor(private http: HttpClient) { }
 
   createAfiliacion(data: any): Observable<any> {
-    // const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    
     return this.http.post(
       `${environment.backendUrl}/afiliaciones`, data,
       { withCredentials: true }
@@ -23,15 +23,9 @@ export class AppService {
       { withCredentials: true }
     );
   }
-  //router.get('/documentos/:id/:tipo', documentosController.getDocumento);
-  getDocumento(id: string, tipo: string): Observable<any> {
-    return this.http.get(
-      `${environment.backendUrl}/documentos/${id}/${tipo}`,
-      { responseType: 'blob', withCredentials: true }
-    );
-  }
 
-  //    router.get('/afiliaciones/nombre/:nombreComercial/:giro', afiliacionController.getAfiliacionPorNombreYGiro);
+
+  
 
   getAfiliacionPorNombreYGiro(nombreComercial: string, giro: string): Observable<any> {
     return this.http.get(
@@ -92,14 +86,14 @@ export class AppService {
       { withCredentials: true }
     );
   }
-  //    router.get('/info', verification.getInfo);
+  
 
-  // getInfo(): Observable<any> {
-  //   return this.http.get(
-  //     `${environment.backendUrl}/info`,
-  //     { withCredentials: true }
-  //   );
-  // }
+  
+  
+  
+  
+  
+  
 
   verifyToken(): Observable<any> {
     return this.http.get(
@@ -115,7 +109,7 @@ export class AppService {
   }
 
 
-  //    router.get('/mis-datos', afiliacionController.getMiAfiliacion);
+  
   getMiAfiliacion(): Observable<any> {
     return this.http.get(
       `${environment.backendUrl}/mis-datos`,
@@ -175,10 +169,13 @@ export class AppService {
     );
   }
 
-
-
-
-
-
+  downloadDocumento(id: number, key: string): Observable<Blob> {
+    const url = `${environment.backendUrl}/documentos/${id}/${key}`;
+    // OJO: Sin genéricos, para que Angular elija el overload que hace xhr.responseType = 'blob'
+    return this.http.get(url, {
+      responseType: 'blob',
+      withCredentials: true
+    });
+  }
 
 }

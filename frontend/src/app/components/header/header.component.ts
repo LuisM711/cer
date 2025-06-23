@@ -15,28 +15,36 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  
+
   showNotifications: boolean = false;
   birthdays: any[] = [];
   isAdmin: boolean = false;
+  isOperador: boolean = false;
   toggleNotifications(): void {
     this.showNotifications = !this.showNotifications;
   }
-  constructor(private appService: AppService) { }
+  constructor(private appService: AppService) { this.getBirthdays(); }
   ngOnInit() {
     this.appService.verifyAdmin().subscribe(
       (response: any) => {
         this.isAdmin = response.success;
-        if(this.isAdmin) {
-          this.getBirthdays();
-        }
+
       },
       (error: any) => {
         console.error('Error verifying admin status:', error);
       }
     );
-    
-    
+    this.appService.verifyOperador().subscribe(
+      (response: any) => {
+        this.isOperador = response.success;
+
+      },
+      (error: any) => {
+        console.error('Error verifying operador status:', error);
+      }
+    );
+
+
   }
   getBirthdays() {
     this.appService.getBirthdays().subscribe(

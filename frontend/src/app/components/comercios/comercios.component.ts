@@ -5,7 +5,7 @@ import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angu
 import { MatIconModule } from '@angular/material/icon';
 import { AppService } from '../../app.service';
 import { NgFor, CommonModule } from '@angular/common';
-import { environment } from '../../../environments/app.environment';
+import { environment } from '../../../environments/environment';
 import { MatButtonModule } from '@angular/material/button';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -36,6 +36,8 @@ export class ComerciosComponent {
   searchText: string = "";
 
   isAdmin = false;
+    isOperador = false;
+
   constructor(private appService: AppService, private dialog: MatDialog) {
 
     this.appService.verifyAdmin().subscribe({
@@ -46,6 +48,14 @@ export class ComerciosComponent {
       },
       error: (error: any) => {
         console.error('Error verifying admin status:', error);
+      }
+    });
+    this.appService.verifyOperador().subscribe({
+      next: (response: any) => {
+        this.isOperador = response.success;
+      },
+      error: (error: any) => {
+        console.error('Error verifying operador status:', error);
       }
     });
   }
@@ -722,10 +732,10 @@ export class ComercioDialogComponent implements OnInit {
 
   toLabel(key: string): string {
     return {
-      comprobanteSucursal: 'Comprobante sucursal',
-      comprobanteMatriz: 'Comprobante matriz',
+      comprobanteSucursal: 'Comprobante de la sucursal',
+      comprobanteMatriz: 'Comprobante de la matriz',
       ine: 'INE',
-      csf: 'Constancia Fiscal',
+      csf: 'CSF',
       logoPdf: 'Logo (PDF)',
       logoPng: 'Logo (PNG)'
     }[key] || key;
@@ -759,24 +769,26 @@ export class ComercioDialogComponent implements OnInit {
   }
 
   async verDocumento(doc: Documento) {
-      try {
-        const res = await fetch(
-          `${environment.backendUrl}/documentos/${this.data.id}/${doc.key}`,
-          { credentials: 'include' }
-        );
-        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-        const blob = await res.blob();
-        console.log('fetch → Blob?', blob instanceof Blob, 'size=', blob.size);
-        const blobUrl = URL.createObjectURL(blob);
-        this.dialog.open(DocumentViewerDialogComponent, {
-          data: { blobUrl, label: doc.label, inline: doc.inline },
-          width: '80vw',
-          height: '80vh'
-        });
-      } catch (err) {
-        console.error('Fetch error:', err);
-      }
-    }
+  const url = `${environment.backendUrl}/documentos/${this.data.id}/${doc.key}`;
+  try {
+    const res = await fetch(url, { credentials: 'include' });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    const blob = await res.blob();
+
+    const blobUrl = URL.createObjectURL(blob);
+    this.dialog.open(DocumentViewerDialogComponent, {
+      data: { blobUrl, label: doc.label, inline: doc.inline },
+      width: '50vw',        // antes 80vw
+      height: '90vh',       // antes 80vh
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      panelClass: 'document-viewer-dialog'
+    });
+  } catch (err) {
+    console.error('Fetch error:', err);
+  }
+}
+
 
   onSubmit() {
     if (this.form.invalid) {

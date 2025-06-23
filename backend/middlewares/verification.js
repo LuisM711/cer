@@ -37,10 +37,9 @@ module.exports.verifyAdmin = (req, res, next) => {
 
 
 }
-module.exports.verifyAfiliado = (req, res, next) => {
+module.exports.verifyOperador = (req, res, next) => {
     try {
-        if (req.session.token.role === 'afiliado') {
-
+        if (req.session.token.role === 'operador' || req.session.token.role === 'admin') {
             return next();
         } else {
             return res.status(401).json({ error: 'No autorizado' });
@@ -50,7 +49,6 @@ module.exports.verifyAfiliado = (req, res, next) => {
         return res.status(401).json({ error: 'No autorizado' });
 
     }
-
 
 }
 module.exports.isLogged = (req, res) => {
@@ -67,8 +65,8 @@ module.exports.isAdmin = (req, res) => {
         return res.json({ success: false });
     }
 }
-module.exports.isAfiliado = (req, res) => {
-    if (req.session.token && req.session.token.role === 'afiliado') {
+module.exports.isOperador = (req, res) => {
+    if (req.session.token && (req.session.token.role === 'operador' || req.session.token.role === 'admin')) {
         return res.json({ success: true, role: req.session.token.role });
     } else {
         return res.json({ success: false });

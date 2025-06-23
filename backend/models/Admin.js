@@ -2,7 +2,7 @@
 const { Model, DataTypes } = require('sequelize')
 const sequelize = require('../database.js')
 
-class Admin extends Model {}
+class Admin extends Model { }
 Admin.init({
     id: {
         type: DataTypes.INTEGER,
@@ -41,51 +41,53 @@ Admin.init({
     timestamps: true,
     hooks: {
         afterSync: async () => {
-            // usuario admin de prueba
-            await Admin.findOrCreate({
-                where: { email: 'luismario.lr46@gmail.com' },
-                defaults: {
-                    nombre: 'Luis Mario Lopez',
-                    password: 'Luis1234',
-                    telefono: '1234567890',
-                    tipo: 'admin',
-                    isActive: true
-                }
-            })
-            await Admin.findOrCreate({
-                where: { email: 'mariozazueta@metropizza.com.mx' },
-                defaults: {
-                    nombre: 'Mario Zazueta',
-                    password: 'MarioZazueta1234',
-                    telefono: '6681380825',
-                    tipo: 'admin',
-                    isActive: true
-                }
-            })
-            await Admin.findOrCreate({
-                where: { email: 'gerencia@consejoempresarialrestaurantero.com' },
-                defaults: {
-                    nombre: 'Operador Consejo Empresarial',
-                    password: 'OperadorCER1234',
-                    telefono: '6681380825',
-                    tipo: 'operador',
-                    isActive: true
-                }
-            })
+            const count = await Admin.count();
+            if (count === 0) {
+                await Admin.bulkCreate([
+                    {
+                        email: 'luismario.lr46@gmail.com',
+                        nombre: 'Luis Mario Lopez',
+                        password: 'Luis1234',
+                        telefono: '1234567890',
+                        tipo: 'admin',
+                        isActive: true
+                    },
+                    {
+                        email: 'mariozazueta@metropizza.com.mx',
+                        nombre: 'Mario Zazueta',
+                        password: 'MarioZazueta1234',
+                        telefono: '6681380825',
+                        tipo: 'admin',
+                        isActive: true
+                    },
+                    {
+                        email: 'gerencia@consejoempresarialrestaurantero.com',
+                        nombre: 'Operador Consejo Empresarial',
+                        password: 'OperadorCER1234',
+                        telefono: '6681380825',
+                        tipo: 'operador',
+                        isActive: true
+                    },
+                    {
+                        email: 'operador@test.com',
+                        nombre: 'Operador Test',
+                        password: 'Operador1234',
+                        telefono: '0987654321',
+                        tipo: 'operador',
+                        isActive: true
+                    },
+                    {
+                        email: 'consejorestaurantero@gmail.com',
+                        nombre: 'Consejo Empresarial Restaurantero',
+                        password: 'CER1234',
+                        telefono: '1234567890',
+                        tipo: 'solover',
+                        isActive: true
+                    }
 
-            // usuario operador de prueba
-            await Admin.findOrCreate({
-                where: { email: 'operador@test.com' },
-                defaults: {
-                    nombre: 'Operador Test',
-                    password: 'Operador1234',
-                    telefono: '0987654321',
-                    tipo: 'operador',
-                    isActive: true
-                }
-            })
+                ], { validate: true });
+            }
         }
     }
-})
-
-module.exports = Admin
+});
+module.exports = Admin;

@@ -13,11 +13,11 @@ module.exports = () => {
         return res.json({ message: 'Bienvenido a la API' });
     });
 
-    router.post('/afiliaciones', verification.verifyToken, afiliacionController.createAfiliacion);
+    router.post('/afiliaciones', verification.verifyOperador, afiliacionController.createAfiliacion);
     router.get('/afiliaciones', verification.verifyToken, afiliacionController.getAfiliaciones);
     router.get('/afiliaciones/:id', verification.verifyToken, afiliacionController.getAfiliacionById);
 
-    router.put('/afiliaciones/:id', verification.verifyAdmin, afiliacionController.updateAfiliacion);
+    router.put('/afiliaciones/:id', verification.verifyOperador, afiliacionController.updateAfiliacion);
     router.get('/afiliaciones/giro/:giro', verification.verifyToken, afiliacionController.getAfiliacionByGiro);
     router.get('/documentos/:id/:tipo', verification.verifyToken, documentosController.getDocumento);
     router.get('/afiliaciones/nombre/:nombreComercial/:giro', verification.verifyToken, afiliacionController.getAfiliacionPorNombreYGiro);
@@ -46,6 +46,7 @@ module.exports = () => {
     //verification.verifyToken,
     router.get('/getInfo', verification.verifyToken, verification.getInfo);
     router.get('/verifyToken', verification.isLogged);
+    router.get('/verifyOperador', verification.isOperador);
     router.get('/verifyAdmin', verification.isAdmin);
     // router.get('/verifyAfiliado', verification.isAfiliado);
 

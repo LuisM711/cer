@@ -9,13 +9,13 @@ import { OperadoresComponent } from './components/operadores/operadores.componen
 import { SubgirosComponent } from './components/subgiros/subgiros.component';
 import { FechasImportantesComponent } from './components/fechas-importantes/fechas-importantes.component';
 
-import { verificarGuard, verificarGuardAdmin } from './verificar.guard';
+import { verificarGuard, verificarGuardAdmin, verificarGuardOperador } from './verificar.guard';
 
 export const routes: Routes = [
 
     { path: '', redirectTo: '/main', pathMatch: 'full' },
     { path: 'login', component: LoginComponent, title: 'Inicio de sesión' },
-    { path: 'afiliacion', component: AfiliacionComponent, canActivate: [verificarGuard], title: 'Afiliación' },
+    { path: 'afiliacion', component: AfiliacionComponent, canActivate: [verificarGuardOperador], title: 'Afiliación' },
     { path: 'main', component: MainComponent, canActivate: [verificarGuard], title: 'Consejo Empresarial Restaurantero' },
     { path: 'comercios', component: ComerciosComponent, canActivate: [verificarGuard], title: 'Comercios' },
     { path: 'restaurantes', component: RestaurantesComponent, canActivate: [verificarGuard], title: 'Restaurantes' },

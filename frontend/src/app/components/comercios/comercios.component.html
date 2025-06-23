@@ -10,7 +10,7 @@
 <div style="min-height: 90vh;text-align: center;margin-top: 20px;">
     <p *ngIf="noResults" class="no-results">No se encontraron resultados.</p>
 
-    <button type="button" mat-raised-button color="primary" (click)="reporteGeneral()">
+    <button type="button" mat-raised-button color="primary" *ngIf="isOperador" (click)="reporteGeneral()">
         <img src="/assets/logos/excel.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
         Descargar reporte general
     </button>

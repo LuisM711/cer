@@ -10,20 +10,24 @@
     </h1>
 
     <div class="icon-container right-icon">
-        <button mat-icon-button routerLink="/operadores" class="transparent-button" *ngIf="isAdmin" matTooltip="Manejar operadores">
+        <button mat-icon-button routerLink="/operadores" class="transparent-button" *ngIf="isAdmin"
+            matTooltip="Manejar operadores">
             <mat-icon>manage_accounts</mat-icon>
         </button>
-         <button mat-icon-button routerLink="/subgiros" class="transparent-button" *ngIf="isAdmin" matTooltip="Manejar subgiros">
+        <button mat-icon-button routerLink="/subgiros" class="transparent-button" *ngIf="isAdmin"
+            matTooltip="Manejar subgiros">
             <mat-icon>change_circle</mat-icon>
         </button>
-        <button mat-icon-button routerLink="/fechas-importantes" class="transparent-button" matTooltip="Ver fechas importantes">
+        <button mat-icon-button routerLink="/fechas-importantes" class="transparent-button"
+            matTooltip="Ver fechas importantes">
             <mat-icon>calendar_month</mat-icon>
         </button>
-        <button mat-icon-button class="transparent-button" (click)="toggleNotifications()"  matTooltip="Notificaciones">
+        <button mat-icon-button class="transparent-button" (click)="toggleNotifications()" matTooltip="Notificaciones">
             <mat-icon>notifications</mat-icon>
         </button>
 
-        <button mat-icon-button routerLink="/afiliacion" class="transparent-button"  matTooltip="Agregar afiliado">
+        <button mat-icon-button routerLink="/afiliacion" class="transparent-button" *ngIf="isOperador"
+            matTooltip="Agregar afiliado">
             <mat-icon>add</mat-icon>
         </button>
 

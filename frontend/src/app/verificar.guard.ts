@@ -48,3 +48,24 @@ export const verificarGuardAdmin: CanActivateFn = (route, state) => {
     );
 };
 
+export const verificarGuardOperador: CanActivateFn = (route, state) => {
+    const appService = inject(AppService);
+    const router = inject(Router);
+    const snackBar = inject(MatSnackBar);
+    return appService.verifyOperador().toPromise().then(
+        (data) => {
+            if (data.success) return true;
+            snackBar.open('No tienes privilegios para entrar a esta página.', 'Cerrar', {
+                duration: 3000,
+            });
+            return router.navigate(['/login']);
+        },
+        (error: any) => {
+            snackBar.open('Ha ocurrido un error al momento de tratar de ingresar a la página.', 'Cerrar', {
+                duration: 3000,
+            });
+            console.error("Error al verificar:", error);
+            return router.navigate(['/login']);
+        }
+    );
+};

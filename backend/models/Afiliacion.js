@@ -15,12 +15,10 @@ Afiliacion.init({
     razonSocial: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
     nombreComercial: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
     giro: {
         type: DataTypes.STRING,
@@ -52,12 +50,12 @@ Afiliacion.init({
     // --- Ubicación ---
     domicilioFiscal: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false
     },
     domicilioSucursal: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     codigoPostal: {
         type: DataTypes.STRING,
@@ -68,7 +66,6 @@ Afiliacion.init({
     rfc: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true,
         validate: {
             is: /^([A-ZÑ&]{3,4})-?([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])-?([A-Z\d]{3})$/i
         }
@@ -164,12 +161,12 @@ Afiliacion.init({
     tableName: 'afiliaciones',
     timestamps: true,
     indexes: [
-        { unique: true, fields: ['razonSocial'] },
-        { unique: true, fields: ['nombreComercial'] },
-        { unique: true, fields: ['domicilioFiscal'] },
-        { unique: true, fields: ['rfc'] },
-        { unique: true, fields: ['emailPropietario'] },
-        { unique: true, fields: ['emailGerente'] }
+        // { unique: true, fields: ['razonSocial'] },
+        // { unique: true, fields: ['nombreComercial'] },
+        // { unique: true, fields: ['domicilioFiscal'] },
+        // { unique: true, fields: ['rfc'] },
+        // { unique: true, fields: ['emailPropietario'] },
+        // { unique: true, fields: ['emailGerente'] }
     ],
     hooks: {
         beforeCreate: (afiliacion, options) => {

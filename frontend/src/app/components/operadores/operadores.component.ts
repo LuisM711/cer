@@ -136,7 +136,7 @@ export class ConfirmDialogComponent {
   ],
   template: `
     <h2 mat-dialog-title>
-      {{ data.operador ? 'Editar' : 'Nuevo' }} Operador
+      {{ data.operador ? 'Editar' : 'Nuevo' }} operador
     </h2>
     <form [formGroup]="form" (ngSubmit)="save()">
       <mat-dialog-content class="dialog-content">

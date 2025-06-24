@@ -21,6 +21,10 @@ module.exports.login = async (req, res) => {
             return res.status(401).json({ error: 'Credenciales inválidas' });
         }
 
+        if (!user.isActive) {
+            return res.status(403).json({ error: 'Usuario inactivo' });
+        }
+
         req.session.token = { id: user.id, role };
         return res.status(200).json({ message: 'Login exitoso', role });
     } catch (error) {

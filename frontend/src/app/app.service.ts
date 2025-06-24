@@ -168,6 +168,13 @@ export class AppService {
     );
   }
 
+  getAfiliacionById(id: string): Observable<any> {
+    return this.http.get(
+      `${environment.backendUrl}/afiliaciones/${id}`,
+      { withCredentials: true }
+    );
+  }
+
 
   actualizarFechaVencimiento(id: string, data: any): Observable<any> {
     return this.http.put(

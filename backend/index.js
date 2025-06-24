@@ -59,21 +59,28 @@ app.disable('x-powered-by');
 app.use('/', routes());
 
 
+
+
+// const qi = sequelize.getQueryInterface();
+
+// // 1) Lista los índices de 'afiliaciones'
+// (async () => {
+//   const [results] = await sequelize.query(
+//     "PRAGMA table_info('afiliaciones');"
+//   );
+//   console.table(results);
+// })();
+
+
+
+
+
 sequelize.sync({ force: false })
   .then(() => {
-    console.log('Base de datos sincronizada sin derribar tablas');
+    console.log('Base de datos sincronizada y alterada para reflejar cambios en el modelo');
   })
   .catch(err => {
-    console.error('❌ Error al sincronizar la BD:', err.name);
-    if (err.name === 'SequelizeValidationError') {
-      err.errors.forEach(e => {
-        console.error(
-          `– [${e.type}] Campo “${e.path}”: ${e.message} (valor: ${e.value})`
-        );
-      });
-    } else {
-      console.error(err);
-    }
+    console.error('❌ Error al sincronizar la BD:', err);
     process.exit(1);
   });
 

@@ -94,30 +94,89 @@ export class FechasImportantesComponent implements OnInit {
     return tipo === 'Cumpleaños' ? 'cake' : 'event';
   }
   renovar(item: FechaImportante) {
-  const ref = this.dialog.open(RenewExpirationDialogComponent, {
-    data: {
-      afiliacionId: item.afiliacionId,
-      currentFecha: item.fecha
-    }
-  });
+    const ref = this.dialog.open(RenewExpirationDialogComponent, {
+      data: {
+        afiliacionId: item.afiliacionId,
+        currentFecha: item.fecha
+      }
+    });
 
-  ref.afterClosed().subscribe(newFecha => {
-    if (newFecha) {
-      this.appService.actualizarFechaVencimiento(
-        item.afiliacionId.toString(),
-        { fechaVencimiento: newFecha.toISOString().slice(0, 10) }
-      ).subscribe(() => {
-        // Actualiza la fecha del ítem
-        item.fecha = newFecha;
 
-        // Crea un nuevo array, ordénalo y así Angular volverá a renderizarlo
-        this.vencimientoItems = [
-          ...this.vencimientoItems
-        ].sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
-      }, err => console.error(err));
-    }
-  });
-}
+    ref.afterClosed().subscribe(newFecha => {
+      if (newFecha) {
+        this.appService.actualizarFechaVencimiento(
+          item.afiliacionId.toString(),
+          { fechaVencimiento: newFecha.toISOString().slice(0, 10) }
+        ).subscribe(() => {
+          // Actualiza la fecha del ítem
+          item.fecha = newFecha;
+
+          // Crea un nuevo array, ordénalo y así Angular volverá a renderizarlo
+          this.vencimientoItems = [
+            ...this.vencimientoItems
+          ].sort((a, b) => a.fecha.getTime() - b.fecha.getTime());
+        }, err => console.error(err));
+      }
+    });
+  }
+  generarCarta(item: FechaImportante) {
+    const id = item.afiliacionId;
+    this.appService.getAfiliacionById(id.toString()).subscribe(
+      (afiliacion) => {
+        console.log(afiliacion);
+        const printContents = `
+            <html>
+        <head>
+          <title>Reafiliación ${afiliacion.razonSocial}</title>
+          <style>
+            @page { margin: 2cm 1cm; }
+            body, html { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+            .content {
+              display: flex;
+              flex-direction: column;
+              margin-top: 100px;
+              line-height:1.8;
+            }
+            p {
+              margin: 0;
+              font-size: 18px;
+            }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          <div style="position: absolute; top: 10px; right: 20px; font-size: 14px;">
+            <strong>Fecha:</strong> 
+            ${new Date().toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
+          </div>
+          <div class="content">
+            <p><strong>RAZÓN SOCIAL:</strong> ${afiliacion.razonSocial}</p>
+            <p><strong>NOMBRE COMERCIAL:</strong> ${afiliacion.nombreComercial}</p>
+            <p><strong>DIRECCIÓN SUCURSAL:</strong> ${afiliacion.domicilioSucursal}</p>
+            <p><strong>FECHA DE AFILIACIÓN:</strong>
+              ${new Date(afiliacion.fechaAfiliacion).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
+            </p>
+            <p><strong>FECHA DE VENCIMIENTO:</strong> 
+              ${new Date(afiliacion.fechaVencimiento).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' })}
+            </p>
+            
+          </div>
+        </body>
+            </html>
+          `;
+
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(printContents);
+          printWindow.document.close();
+        }
+      },
+      (err) => {
+        console.error('Error al obtener la afiliación:', err);
+      }
+    );
+
+
+  }
 }
 
 

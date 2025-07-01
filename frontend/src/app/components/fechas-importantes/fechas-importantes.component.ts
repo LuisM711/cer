@@ -40,7 +40,7 @@ interface FechaImportante {
   styleUrls: ['./fechas-importantes.component.css']
 })
 export class FechasImportantesComponent implements OnInit {
-  displayedColumns = ['icon', 'fecha', 'razonSocial', 'propietario', 'accion'];
+  displayedColumns = ['icon', 'fecha', 'razonSocial', 'propietario', 'acciones'];
   birthdayItems: FechaImportante[] = [];
   vencimientoItems: FechaImportante[] = [];
 

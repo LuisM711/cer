@@ -65,10 +65,7 @@ Afiliacion.init({
     // --- Identificación Fiscal ---
     rfc: {
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            is: /^([A-ZÑ&]{3,4})-?([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])-?([A-Z\d]{3})$/i
-        }
+        allowNull: false
     },
 
     // --- Teléfonos ---

@@ -67,15 +67,22 @@ button {
     width: 100%;
   }
 }
+
 .section-header {
   margin-top: 16px;
   margin-bottom: 8px;
   font-size: 1.1rem;
   font-weight: 500;
-  color: rgba(0,0,0,0.87);
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .section-divider {
   margin: 24px 0;
+}
+
+.step-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
 }
 

@@ -51,28 +51,8 @@ const sessConfig = {
   }
 };
 app.use(session(sessConfig));
-
-// 4) DESHABILITAR HEADER
 app.disable('x-powered-by');
-
-// 5) RUTAS
 app.use('/', routes());
-
-
-
-
-// const qi = sequelize.getQueryInterface();
-
-// // 1) Lista los índices de 'afiliaciones'
-// (async () => {
-//   const [results] = await sequelize.query(
-//     "PRAGMA table_info('afiliaciones');"
-//   );
-//   console.table(results);
-// })();
-
-
-
 
 
 sequelize.sync({ force: false })

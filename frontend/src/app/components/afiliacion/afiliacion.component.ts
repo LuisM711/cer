@@ -1,91 +1,58 @@
-//afiliacion.component.ts
-import { Component } from '@angular/core';
+
+import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  FormsModule
+} from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
-import { AppService } from '../../app.service';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { HeaderComponent } from '../header/header.component';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule, MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatStepperModule } from '@angular/material/stepper';
+
+import { AppService } from '../../app.service';
+import { HeaderComponent } from '../header/header.component';
+import { Router } from '@angular/router';
+
+
 @Component({
   selector: 'app-afiliacion',
   standalone: true,
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatStepperModule,
     MatDatepickerModule,
     MatInputModule,
     MatFormFieldModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule,
     MatSelectModule,
     MatSnackBarModule,
-    HeaderComponent,
     MatDividerModule,
-
+    MatDialogModule,
+    HeaderComponent,
 
   ],
   templateUrl: './afiliacion.component.html',
   styleUrls: ['./afiliacion.component.css']
 })
 export class AfiliacionComponent {
-  public maxTabIndex: number = 5;
-  // inject AppService
-
-  afiliacionForm: FormGroup;
+  maxTabIndex = 5;
   selectedTabIndex = 0;
-  // document: any;
-  // giros = [
-  //   {
-  //     value: 1, name: 'Comercio',
-  //     subgiros: [
-  //       { value: 1, name: 'Abarrotes' },
-  //       { value: 2, name: 'Electrónica' },
-  //       { value: 3, name: 'Ropa y calzado' },
-  //       { value: 4, name: 'Ferretería' },
-  //       { value: 5, name: 'Paneles solares' },
-  //       { value: 6, name: 'Papelería' },
-  //       { value: 7, name: 'Deportes' }
-  //     ]
-  //   },
-  //   {
-  //     value: 2, name: 'Restuarante',
-  //     subgiros: [
-  //       { value: 1, name: 'Pizzería' },
-  //       { value: 2, name: 'Sushi' },
-  //       { value: 3, name: 'Comida china' },
-  //       { value: 4, name: 'Café' },
-  //       { value: 5, name: 'Tacos' },
-  //       { value: 6, name: 'Cocina económica' },
-  //       { value: 7, name: 'Mariscos' },
-  //     ]
-  //   }
-  // ];
-  // subgiros: { value: number, name: string }[] = [];
   giros: any[] = [];
   subgiros: any[] = [];
-
-
-
-
-
-  onGiroChange(selectedGiro: any): void {
-    this.subgiros = selectedGiro ? selectedGiro.subgiros : [];
-    this.afiliacionForm.get('subgiro')?.reset();
-  }
-
-
   documentos = [
     { name: 'comprobanteSucursal', label: 'Comprobante Dom. Sucursal' },
     { name: 'comprobanteMatriz', label: 'Comprobante Dom. Matriz' },
@@ -94,10 +61,17 @@ export class AfiliacionComponent {
     { name: 'logoPdf', label: 'Logotipo en PDF Editable' },
     { name: 'logoPng', label: 'Logotipo en PNG' },
   ];
-  fileInput: any;
-  selectedGiro: any;
 
-  constructor(private fb: FormBuilder, private appService: AppService, private snackBar: MatSnackBar, private dialog: MatDialog) {
+  afiliacionForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder,
+    private appService: AppService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    private router: Router
+  ) {
+
     this.afiliacionForm = this.fb.group({
       razonSocial: ['', Validators.required],
       nombreComercial: ['', Validators.required],
@@ -111,17 +85,15 @@ export class AfiliacionComponent {
       domicilioSucursal: ['', Validators.required],
       codigoPostal: ['', Validators.required],
       telefonoOficina: ['', Validators.required],
-      rfc: ['', [Validators.required, Validators.pattern(/^([A-ZÑ&]{3,4}) ?-?([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01]) ?-?([A-Z\d]{3})$/i)]],
+      rfc: ['', [Validators.required]],
       nombrePropietario: ['', Validators.required],
       telefonoPropietario: ['', Validators.required],
       emailPropietario: ['', [Validators.required, Validators.email]],
       fechaNacimientoPropietario: ['', Validators.required],
-
       nombreGerente: ['', Validators.required],
       telefonoGerente: ['', Validators.required],
       emailGerente: ['', [Validators.required, Validators.email]],
       fechaNacimientoGerente: ['', Validators.required],
-
       comprobanteSucursal: [null, Validators.required],
       comprobanteMatriz: [null, Validators.required],
       fechaAlta: [new Date(), Validators.required],
@@ -135,18 +107,24 @@ export class AfiliacionComponent {
       csf: ['', Validators.required],
       logoPdf: ['', Validators.required],
       logoPng: ['', Validators.required]
-      // ine: [''],
-      // csf: [''],
-      // logoPdf: [''],
-      // logoPng: ['']
     });
+
+
     this.loadGiros();
+
+
+
+
+
+    this.afiliacionForm.valueChanges.subscribe(() => {
+      this.afiliacionForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+    });
   }
-  private loadGiros(): void {
-    this.appService.getGiros().subscribe(
-      (resp: any[]) => {
-        // resp es array plano [{giro,subgiro},…]
-        const map = new Map<string, { name: string; subgiros: { name: string }[] }>();
+
+  private loadGiros() {
+    this.appService.getGiros().subscribe({
+      next: (resp: any[]) => {
+        const map = new Map<string, { name: string; subgiros: any[] }>();
         resp.forEach(item => {
           if (!map.has(item.giro)) {
             map.set(item.giro, { name: item.giro, subgiros: [] });
@@ -157,16 +135,24 @@ export class AfiliacionComponent {
           }
         });
         this.giros = Array.from(map.values());
-        // si ya había seleccionado un giro, refresca subgiros
         const cur = this.afiliacionForm.get('giro')!.value;
         if (cur) this.onGiroChange(cur);
       },
-      err => {
-        console.error(err);
+      error: () => {
         this.snackBar.open('No se pudieron cargar los giros', 'Cerrar', { duration: 3000 });
       }
-    );
+    });
   }
+
+  onGiroChange(selectedGiro: any) {
+    this.subgiros = selectedGiro?.subgiros || [];
+    this.afiliacionForm.get('subgiro')!.reset();
+  }
+
+  fileInput: any;
+  selectedGiro: any;
+
+
   addSubgiro() {
     const selected = this.afiliacionForm.get('giro')!.value as { name: string; subgiros: any[] };
     if (!selected) {
@@ -213,19 +199,19 @@ export class AfiliacionComponent {
   }
   getCurrentTabControls(): FormGroup {
     const controlGroups = [
-      // 0: Datos generales
+
       ['razonSocial', 'nombreComercial', 'giro', 'subgiro'],
-      // 1: Giro y contacto
+
       ['paginaWeb', 'facebook', 'googleMaps', 'instagram'],
-      // 2: Propiedad
+
       ['nombrePropietario', 'telefonoPropietario', 'emailPropietario', 'fechaNacimientoPropietario',
         'nombreGerente', 'telefonoGerente', 'emailGerente', 'fechaNacimientoGerente'],
-      // 3: Datos fiscales
+
       ['domicilioFiscal', 'domicilioSucursal', 'codigoPostal', 'rfc', 'telefonoOficina'],
-      // 4: Fechas
+
       ['fechaAlta', 'fechaAfiliacion', 'fechaVencimiento', 'poliza', 'polizaUbicacion', 'numeroFactura',
         'importeFactura'],
-      // 5: Documentos
+
       ['comprobanteSucursal', 'comprobanteMatriz', 'ine', 'csf', 'logoPdf', 'logoPng']
     ];
 
@@ -245,11 +231,11 @@ export class AfiliacionComponent {
 
   /** Restricciones de archivos por controlName */
   private fileConstraints: Record<string, { maxSize: number; types: string[] }> = {
-    // Solo PNG
+
     logoPng: { maxSize: 2 * 1024 * 1024, types: ['image/png'] },
-    // Solo PDF
+
     logoPdf: { maxSize: 2 * 1024 * 1024, types: ['application/pdf'] },
-    // Para todos los demás: imágenes o PDF
+
     default: { maxSize: 2 * 1024 * 1024, types: ['image/*', 'application/pdf'] }
   };
 
@@ -259,12 +245,12 @@ export class AfiliacionComponent {
     if (!input.files?.length) return;
 
     const file = input.files[0];
-    // Accede a la restricción específica o a la de 'default' usando corchetes
+
     const constraint = this.fileConstraints[controlName]
       ?? this.fileConstraints['default'];
     const { maxSize, types } = constraint;
 
-    // 1️⃣ Valida tamaño
+
     if (file.size > maxSize) {
       this.snackBar.open(
         `“${file.name}” excede ${(maxSize / 1024 / 1024).toFixed(1)} MB.`,
@@ -276,7 +262,7 @@ export class AfiliacionComponent {
       return;
     }
 
-    // 2️⃣ Valida MIME
+
     const validType = types.some(allowed => {
       if (allowed.endsWith('/*')) {
         return file.type.startsWith(allowed.slice(0, -1));
@@ -294,7 +280,7 @@ export class AfiliacionComponent {
       return;
     }
 
-    // 3️⃣ Asigna al control
+
     this.afiliacionForm.get(controlName)!.setValue(file);
   }
 
@@ -325,8 +311,11 @@ export class AfiliacionComponent {
         formData.append(key, value != null ? value.toString() : '');
       }
     });
+    //get giro
+    const giro = `${raw.giro}s`.toLowerCase();
+    console.log("GIRO");
+    console.log(giro);
 
-    // → Aquí: recorrer con forEach en lugar de entries()
     const debug: Array<{ key: string; value: any }> = [];
     formData.forEach((value, key) => {
       debug.push({ key, value });
@@ -337,11 +326,13 @@ export class AfiliacionComponent {
       next: (resp) => {
         console.log('Éxito:', resp);
         this.snackBar.open('Afiliación creada exitosamente', 'Cerrar', { duration: 3000 });
-        this.afiliacionForm.reset();
+        //routerlink to comercios/restaurantes 
+        // window.location.href = '/comercios';
+        this.router.navigate([`/${giro}`]);
       },
       error: (err) => {
         console.error('Error al crear la afiliación:', err);
-        // no resetees el form, permite corregir y volver a enviar
+
       }
     });
   }

@@ -5,16 +5,17 @@
         <h1>Registro de afiliación</h1>
 
         <form [formGroup]="afiliacionForm" (ngSubmit)="onSubmit()" class="form-content">
-            <mat-tab-group [(selectedIndex)]="selectedTabIndex">
-                <!-- Tab 1 -->
-                <mat-tab label="Datos generales">
+            <mat-horizontal-stepper labelPosition="bottom" #stepper [selectedIndex]="selectedTabIndex"
+                (selectionChange)="selectedTabIndex = $event.selectedIndex" linear="false">
+
+                <!-- Paso 1: Datos generales -->
+                <mat-step label="Datos generales">
                     <mat-card>
                         <mat-card-content>
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Razón social</mat-label>
                                 <input matInput formControlName="razonSocial" required>
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('razonSocial')?.hasError('required') && isControlInvalid('razonSocial')">
+                                <mat-error *ngIf="isControlInvalid('razonSocial')">
                                     Este campo es obligatorio
                                 </mat-error>
                             </mat-form-field>
@@ -23,16 +24,14 @@
                                 <mat-label>Nombre comercial</mat-label>
                                 <input matInput formControlName="nombreComercial">
                             </mat-form-field>
-                            <!-- GIRO -->
+
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Giro</mat-label>
                                 <mat-select formControlName="giro" (selectionChange)="onGiroChange($event.value)">
                                     <mat-option *ngFor="let giro of giros" [value]="giro">{{ giro.name }}</mat-option>
-
                                 </mat-select>
                             </mat-form-field>
 
-                            <!-- SUBGIRO -->
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Subgiro</mat-label>
                                 <mat-select formControlName="subgiro" [disabled]="!subgiros.length">
@@ -43,53 +42,53 @@
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
-
                         </mat-card-content>
                     </mat-card>
 
-                </mat-tab>
+                    <div class="step-actions">
+                        <button mat-button type="button" (click)="prevTab()" *ngIf="selectedTabIndex > 0">
+                            Anterior
+                        </button>
+                        <button mat-button type="button" (click)="nextTab()" *ngIf="selectedTabIndex < maxTabIndex">
+                            Siguiente
+                        </button>
+                    </div>
+                </mat-step>
 
-                <!-- Tab 2 -->
-                <mat-tab label="Giro y contacto">
+                <!-- Paso 2: Giro y contacto -->
+                <mat-step label="Giro y contacto">
                     <mat-card>
                         <mat-card-content>
-
-
-
-
-
-
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Página Web (opcional)</mat-label>
                                 <input matInput formControlName="paginaWeb" type="url">
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Facebook (opcional)</mat-label>
                                 <input matInput formControlName="facebook">
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Google Maps (opcional)</mat-label>
                                 <input matInput formControlName="googleMaps">
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Instagram (opcional)</mat-label>
                                 <input matInput formControlName="instagram">
                             </mat-form-field>
                         </mat-card-content>
                     </mat-card>
-                </mat-tab>
-                <mat-tab label="Propiedad">
+
+                    <div class="step-actions">
+                        <button mat-button type="button" (click)="prevTab()">Anterior</button>
+                        <button mat-button type="button" (click)="nextTab()">Siguiente</button>
+                    </div>
+                </mat-step>
+
+                <!-- Paso 3: Propiedad -->
+                <mat-step label="Propiedad">
                     <mat-card>
                         <mat-card-content>
-
-                            <!-- Título sección Propietario -->
                             <h3 class="section-header">Propietario</h3>
-
-                            <!-- Propietario: 4 campos -->
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Nombre del propietario</mat-label>
                                 <input matInput formControlName="nombrePropietario">
@@ -97,7 +96,6 @@
                                     Nombre del propietario es obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Teléfono del propietario</mat-label>
                                 <input matInput formControlName="telefonoPropietario">
@@ -105,7 +103,6 @@
                                     Teléfono del propietario es obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Email del propietario</mat-label>
                                 <input matInput type="email" formControlName="emailPropietario">
@@ -113,7 +110,6 @@
                                     Email inválido o obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Fecha de nacimiento del propietario</mat-label>
                                 <input matInput [matDatepicker]="pickerNacimientoProp"
@@ -125,13 +121,9 @@
                                 </mat-error>
                             </mat-form-field>
 
-                            <!-- Divider -->
                             <mat-divider class="section-divider"></mat-divider>
 
-                            <!-- Título sección Gerente -->
                             <h3 class="section-header">Gerente</h3>
-
-                            <!-- Gerente: otros campos -->
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Nombre del gerente</mat-label>
                                 <input matInput formControlName="nombreGerente">
@@ -139,7 +131,6 @@
                                     Nombre del gerente es obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Teléfono del gerente</mat-label>
                                 <input matInput formControlName="telefonoGerente">
@@ -147,7 +138,6 @@
                                     Teléfono de gerente es obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Email del gerente</mat-label>
                                 <input matInput type="email" formControlName="emailGerente">
@@ -155,7 +145,6 @@
                                     Email inválido o obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Fecha de nacimiento del gerente</mat-label>
                                 <input matInput [matDatepicker]="pickerNacimientoGer"
@@ -163,41 +152,40 @@
                                 <mat-datepicker-toggle matSuffix [for]="pickerNacimientoGer"></mat-datepicker-toggle>
                                 <mat-datepicker #pickerNacimientoGer></mat-datepicker>
                                 <mat-error *ngIf="isControlInvalid('fechaNacimientoGerente')">
-                                    Fecha de nacimiento del gerente es obligatoria
+                                    Fecha de nacimiento es obligatoria
                                 </mat-error>
                             </mat-form-field>
-
                         </mat-card-content>
-
                     </mat-card>
-                </mat-tab>
 
-                <!-- Tab 3 -->
-                <mat-tab label="Datos fiscales">
+                    <div class="step-actions">
+                        <button mat-button type="button" (click)="prevTab()">Anterior</button>
+                        <button mat-button type="button" (click)="nextTab()">Siguiente</button>
+                    </div>
+                </mat-step>
+
+                <!-- Paso 4: Datos fiscales -->
+                <mat-step label="Datos fiscales">
                     <mat-card>
                         <mat-card-content>
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Domicilio Fiscal</mat-label>
                                 <input matInput formControlName="domicilioFiscal">
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Domicilio sucursal</mat-label>
                                 <input matInput formControlName="domicilioSucursal">
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('domicilioSucursal')?.hasError('required') && isControlInvalid('domicilioSucursal')">
+                                <mat-error *ngIf="isControlInvalid('domicilioSucursal')">
                                     Este campo es obligatorio
                                 </mat-error>
                             </mat-form-field>
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Código postal</mat-label>
                                 <input matInput formControlName="codigoPostal">
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('codigoPostal')?.hasError('required') && isControlInvalid('domicilioSucursal')">
+                                <mat-error *ngIf="isControlInvalid('codigoPostal')">
                                     Este campo es obligatorio
                                 </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>RFC</mat-label>
                                 <input matInput formControlName="rfc">
@@ -205,138 +193,100 @@
                                     *ngIf="afiliacionForm.get('rfc')?.hasError('required') && isControlInvalid('rfc')">
                                     RFC es obligatorio
                                 </mat-error>
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('rfc')?.hasError('pattern') && isControlInvalid('rfc')">
-                                    Formato de RFC inválido
-                                </mat-error>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Teléfono oficina</mat-label>
                                 <input matInput formControlName="telefonoOficina">
                             </mat-form-field>
-                            <!--  -->
-
-                            <!--  -->
                         </mat-card-content>
                     </mat-card>
-                </mat-tab>
 
-                <mat-tab label="Fechas">
+                    <div class="step-actions">
+                        <button mat-button type="button" (click)="prevTab()">Anterior</button>
+                        <button mat-button type="button" (click)="nextTab()">Siguiente</button>
+                    </div>
+                </mat-step>
+
+                <!-- Paso 5: Fechas -->
+                <mat-step label="Fechas">
                     <mat-card>
                         <mat-card-content>
                             <mat-form-field appearance="outline" class="full-width">
-                                <mat-label>Fecha de alta (automática)</mat-label>
+                                <mat-label>Fecha de alta</mat-label>
                                 <input matInput
                                     [value]="afiliacionForm.get('fechaAlta')!.value | date:'dd/MM/yyyy':'':'es-MX'"
                                     disabled>
                             </mat-form-field>
-
-                            <!-- <mat-form-field appearance="outline" class="full-width">
-                                <mat-label>Fecha de nacimiento</mat-label>
-                                <input matInput [matDatepicker]="picker" formControlName="fechaNacimiento">
-                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                                <mat-datepicker #picker></mat-datepicker>
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('fechaNacimiento')?.hasError('required') && isControlInvalid('fechaNacimiento')">
-                                    Fecha de nacimiento es obligatoria
-                                </mat-error>
-                            </mat-form-field> -->
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Fecha de afiliación</mat-label>
-                                <input matInput [matDatepicker]="pickerAfiliacion" formControlName="fechaAfiliacion">
-                                <mat-datepicker-toggle matSuffix [for]="pickerAfiliacion"></mat-datepicker-toggle>
-                                <mat-datepicker #pickerAfiliacion></mat-datepicker>
+                                <input matInput [matDatepicker]="pickerAf" formControlName="fechaAfiliacion">
+                                <mat-datepicker-toggle matSuffix [for]="pickerAf"></mat-datepicker-toggle>
+                                <mat-datepicker #pickerAf></mat-datepicker>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Fecha de vencimiento</mat-label>
-                                <input matInput [matDatepicker]="pickerVencimiento" formControlName="fechaVencimiento">
-                                <mat-datepicker-toggle matSuffix [for]="pickerVencimiento"></mat-datepicker-toggle>
-                                <mat-datepicker #pickerVencimiento></mat-datepicker>
+                                <input matInput [matDatepicker]="pickerV" formControlName="fechaVencimiento">
+                                <mat-datepicker-toggle matSuffix [for]="pickerV"></mat-datepicker-toggle>
+                                <mat-datepicker #pickerV></mat-datepicker>
                             </mat-form-field>
-
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Póliza</mat-label>
                                 <input matInput formControlName="poliza">
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('poliza')?.hasError('required') && isControlInvalid('poliza')">
-                                    Póliza es obligatoria
-                                </mat-error>
                             </mat-form-field>
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Póliza (ubicación)</mat-label>
                                 <input matInput formControlName="polizaUbicacion">
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('polizaUbicacion')?.hasError('required') && isControlInvalid('polizaUbicacion')">
-                                    Póliza (ubicación) es obligatoria
-                                </mat-error>
                             </mat-form-field>
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Número de factura</mat-label>
                                 <input matInput formControlName="numeroFactura">
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('numeroFactura')?.hasError('required') && isControlInvalid('numeroFactura')">
-                                    Número de factura es obligatorio
-                                </mat-error>
                             </mat-form-field>
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Importe de factura</mat-label>
                                 <input matInput formControlName="importeFactura">
-                                <mat-error
-                                    *ngIf="afiliacionForm.get('importeFactura')?.hasError('required') && isControlInvalid('importeFactura')">
-                                    Importe de factura es obligatorio
-                                </mat-error>
                             </mat-form-field>
-
                         </mat-card-content>
                     </mat-card>
-                </mat-tab>
 
-                <!-- Tab 4 -->
-                <mat-tab label="Documentos">
+                    <div class="step-actions">
+                        <button mat-button type="button" (click)="prevTab()">Anterior</button>
+                        <button mat-button type="button" (click)="nextTab()">Siguiente</button>
+                    </div>
+                </mat-step>
+
+                <!-- Paso 6: Documentos -->
+                <mat-step label="Documentos">
                     <mat-card>
                         <mat-card-content>
                             <div class="file-upload-section" *ngFor="let doc of documentos">
                                 <h3>{{ doc.label }}</h3>
-
-                                <!-- Un único input, siempre en el mismo DOM que el botón -->
                                 <input #fileInput type="file" hidden [attr.accept]="
-            doc.name === 'logoPng'
-              ? 'image/png'
-              : doc.name === 'logoPdf'
-                ? 'application/pdf'
-                : 'image/*,application/pdf'
-          " (change)="onFileSelected($event, doc.name)" />
-
-                                <!-- Botón Material disparando always fileInput.click() -->
+                    doc.name === 'logoPng'
+                      ? 'image/png'
+                      : doc.name === 'logoPdf'
+                        ? 'application/pdf'
+                        : 'image/*,application/pdf'
+                  " (change)="onFileSelected($event, doc.name)" />
                                 <button mat-raised-button color="primary" type="button" (click)="fileInput.click()">
-                                    <mat-icon style="margin-right: 4px;">upload</mat-icon>
+                                    <mat-icon style="margin-right:4px;">upload</mat-icon>
                                     Subir Archivo
                                 </button>
-
-                                <!-- Nombre del archivo escogido -->
                                 <span *ngIf="afiliacionForm.get(doc.name)?.value" class="archivo-nombre">
                                     {{ afiliacionForm.get(doc.name)?.value.name }}
                                 </span>
                             </div>
                         </mat-card-content>
                     </mat-card>
-                </mat-tab>
 
+                    <div class="step-actions">
+                        <button mat-button type="button" (click)="prevTab()">Anterior</button>
+                        <button mat-raised-button color="accent" type="submit" [disabled]="!afiliacionForm.valid">
+                            Enviar solicitud
+                        </button>
+                    </div>
+                </mat-step>
 
-            </mat-tab-group>
-
-            <div class="submit-section">
-                <button mat-raised-button type="button" (click)="prevTab()"
-                    *ngIf="selectedTabIndex > 0">Anterior</button>
-                <button mat-raised-button type="button" color="primary" (click)="nextTab()"
-                    *ngIf="selectedTabIndex < maxTabIndex">Siguiente</button>
-                <button mat-raised-button color="accent" type="submit" *ngIf="selectedTabIndex === maxTabIndex"
-                    [disabled]="!afiliacionForm.valid">
-                    Enviar solicitud
-                </button>
-            </div>
+            </mat-horizontal-stepper>
         </form>
     </div>
 </div>

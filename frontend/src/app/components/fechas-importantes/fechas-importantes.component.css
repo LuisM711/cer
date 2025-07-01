@@ -7,3 +7,20 @@
 mat-card {
   min-width: 300px;
 }
+:host ::ng-deep table {
+  table-layout: auto;  
+}
+
+
+:host ::ng-deep .mat-column-acciones,
+:host ::ng-deep .mat-header-cell.mat-column-acciones,
+:host ::ng-deep .mat-cell.mat-column-acciones {
+  min-width: 100px;    
+  white-space: nowrap; 
+  overflow: visible;   
+}
+
+
+:host ::ng-deep .mat-cell.mat-column-acciones {
+  text-align: center;
+}

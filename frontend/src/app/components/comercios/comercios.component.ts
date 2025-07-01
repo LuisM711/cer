@@ -213,7 +213,7 @@ export class ComerciosComponent {
       { header: 'Importe de factura', key: 'importeFactura', width: 15 },
 
       { header: 'Activo', key: 'isActive', width: 10 },
-      { header: 'URL Logo', key: 'logoUrl', width: 40 }
+      // { header: 'URL Logo', key: 'logoUrl', width: 40 }
     ];
 
 
@@ -223,7 +223,7 @@ export class ComerciosComponent {
 
         fechaNacimientoPropietario: this.formatDate(r.fechaNacimientoPropietario),
         fechaNacimientoGerente: this.formatDate(r.fechaNacimientoGerente),
-        fechaAlta: this.formatDate(r.fechaAlta),
+        fechaAlta: this.formatDate(r.createdAt),
         fechaAfiliacion: this.formatDate(r.fechaAfiliacion),
         fechaVencimiento: this.formatDate(r.fechaVencimiento),
         createdAt: this.formatDateTime(r.createdAt),
@@ -479,7 +479,7 @@ interface Documento {
           <mat-label>Fecha de alta</mat-label>
           <input matInput [matDatepicker]="pickerFechaAlta" formControlName="fechaAlta" [disabled]="true">
           <mat-datepicker-toggle matSuffix [for]="pickerFechaAlta"></mat-datepicker-toggle>
-          <mat-datepicker  icker #pickerFechaAlta></mat-datepicker>
+          <mat-datepicker  picker #pickerFechaAlta></mat-datepicker>
           <mat-error *ngIf="f['fechaAlta'].invalid && f['fechaAlta'].touched">
             Fecha de alta es obligatoria
           </mat-error>
@@ -693,9 +693,9 @@ export class ComercioDialogComponent implements OnInit {
       domicilioFiscal: [this.data.domicilioFiscal, Validators.required],
       domicilioSucursal: [this.data.domicilioSucursal, Validators.required],
       codigoPostal: [this.data.codigoPostal, Validators.required],
-      rfc: [this.data.rfc, [Validators.required, Validators.pattern(/^([A-ZÑ&]{3,4}) ?-?([0-9]{2})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01]) ?-?([A-Z\d]{3})$/i)]],
+      rfc: [this.data.rfc, [Validators.required]],
       telefonoOficina: [this.data.telefonoOficina, Validators.required],
-      fechaAlta: [{ value: this.data.fechaAlta, disabled: true }, Validators.required],
+      fechaAlta: [{ value: this.data.createdAt, disabled: true }, Validators.required],
       fechaAfiliacion: [this.data.fechaAfiliacion, Validators.required],
       fechaVencimiento: [this.data.fechaVencimiento, Validators.required],
       poliza: [this.data.poliza, Validators.required],

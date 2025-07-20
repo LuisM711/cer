@@ -99,8 +99,8 @@
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Teléfono del propietario</mat-label>
                                 <input matInput formControlName="telefonoPropietario">
-                                <mat-error *ngIf="isControlInvalid('telefonoPropietario')">
-                                    Teléfono del propietario es obligatorio
+                                <mat-error *ngIf="afiliacionForm.get('telefonoPropietario')?.hasError('pattern')">
+                                    Teléfono del propietario debe tener 10 dígitos
                                 </mat-error>
                             </mat-form-field>
                             <mat-form-field appearance="outline" class="full-width">
@@ -134,8 +134,8 @@
                             <mat-form-field appearance="outline" class="full-width">
                                 <mat-label>Teléfono del gerente</mat-label>
                                 <input matInput formControlName="telefonoGerente">
-                                <mat-error *ngIf="isControlInvalid('telefonoGerente')">
-                                    Teléfono de gerente es obligatorio
+                                <mat-error *ngIf="afiliacionForm.get('telefonoGerente')?.hasError('pattern')">
+                                    Teléfono del gerente debe tener 10 dígitos
                                 </mat-error>
                             </mat-form-field>
                             <mat-form-field appearance="outline" class="full-width">
@@ -280,9 +280,12 @@
 
                     <div class="step-actions">
                         <button mat-button type="button" (click)="prevTab()">Anterior</button>
-                        <button mat-raised-button color="accent" type="submit" [disabled]="!afiliacionForm.valid">
+                        <button mat-raised-button color="accent" type="submit" [disabled]="!isFormValid()">
                             Enviar solicitud
                         </button>
+
+                        <!-- <button type="button" (click)="debug()">Debug Form</button> -->
+
                     </div>
                 </mat-step>
 

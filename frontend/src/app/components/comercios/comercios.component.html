@@ -22,10 +22,11 @@
                 </td>
                 <td>{{ comercio.nombreComercial }}</td>
                 <td style="display: flex;justify-content: center;align-items: center;gap: 20px;">
-                    <button type="button" mat-raised-button color="primary" (click)="viewComercio(comercio.id)">
+                    <button [disabled]="this.isReadonly" type="button" mat-raised-button color="primary"
+                        (click)="viewComercio(comercio.id)">
                         <mat-icon>visibility</mat-icon>Ver detalles
                     </button>
-                    <button type="button" mat-raised-button color="primary"
+                    <button [disabled]="this.isReadonly" type="button" mat-raised-button color="primary"
                         (click)="viewPolizaDerechos(comercio.id)">
                         <mat-icon>print</mat-icon>Derechos de póliza
                     </button>

@@ -43,8 +43,17 @@ export class FechasImportantesComponent implements OnInit {
   displayedColumns = ['icon', 'fecha', 'razonSocial', 'propietario', 'acciones'];
   birthdayItems: FechaImportante[] = [];
   vencimientoItems: FechaImportante[] = [];
-
-  constructor(private appService: AppService, private dialog: MatDialog) { }
+  isOperador = false;
+  constructor(private appService: AppService, private dialog: MatDialog) { 
+    this.appService.verifyOperador().subscribe({
+      next: (response: any) => {
+        this.isOperador = response.success;
+      },
+      error: (error: any) => {
+        console.error('Error verifying operador status:', error);
+      }
+    });
+  }
 
   ngOnInit() {
     this.appService.getAfiliaciones().subscribe(

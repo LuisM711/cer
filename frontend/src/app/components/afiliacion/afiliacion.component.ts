@@ -87,11 +87,11 @@ export class AfiliacionComponent {
       telefonoOficina: ['', Validators.required],
       rfc: ['', [Validators.required]],
       nombrePropietario: ['', Validators.required],
-      telefonoPropietario: ['', Validators.required],
+      telefonoPropietario: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       emailPropietario: ['', [Validators.required, Validators.email]],
       fechaNacimientoPropietario: ['', Validators.required],
       nombreGerente: ['', Validators.required],
-      telefonoGerente: ['', Validators.required],
+      telefonoGerente: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       emailGerente: ['', [Validators.required, Validators.email]],
       fechaNacimientoGerente: ['', Validators.required],
       comprobanteSucursal: [null, Validators.required],
@@ -259,6 +259,10 @@ export class AfiliacionComponent {
       );
       input.value = '';
       this.afiliacionForm.get(controlName)!.reset();
+      this.afiliacionForm.get(controlName)!.markAsTouched();
+      this.afiliacionForm.get(controlName)!.markAsDirty();
+      this.afiliacionForm.updateValueAndValidity();
+
       return;
     }
 
@@ -282,6 +286,10 @@ export class AfiliacionComponent {
 
 
     this.afiliacionForm.get(controlName)!.setValue(file);
+    this.afiliacionForm.get(controlName)!.markAsDirty();
+    this.afiliacionForm.get(controlName)!.markAsTouched();
+    this.afiliacionForm.updateValueAndValidity();
+
   }
 
 
@@ -335,6 +343,24 @@ export class AfiliacionComponent {
 
       }
     });
+  }
+  debug() {
+    console.log('DEBUG FORM:', this.afiliacionForm.getRawValue());
+    console.log('DEBUG GIROS:', this.giros);
+    console.log('DEBUG SUBGIROS:', this.subgiros);
+    console.log('Is form valid?', this.afiliacionForm.valid);
+    const invalid = [];
+    const controls = this.afiliacionForm.controls;
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        invalid.push(name);
+      }
+    }
+    console.log('Invalid controls:', invalid);
+
+  }
+  isFormValid(): boolean {
+    return Object.values(this.afiliacionForm.controls).every(control => !control.invalid);
   }
 
 

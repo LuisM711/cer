@@ -36,13 +36,15 @@ export class ComerciosComponent {
   searchText: string = "";
 
   isAdmin = false;
-    isOperador = false;
+  isOperador = false;
+  isReadonly = true;
 
   constructor(private appService: AppService, private dialog: MatDialog) {
 
     this.appService.verifyAdmin().subscribe({
       next: (response: any) => {
         this.isAdmin = response.role === 'admin';
+        this.isReadonly = !this.isAdmin;
 
         console.log(this.isAdmin);
       },
@@ -53,6 +55,7 @@ export class ComerciosComponent {
     this.appService.verifyOperador().subscribe({
       next: (response: any) => {
         this.isOperador = response.success;
+        this.isReadonly = !this.isOperador;
       },
       error: (error: any) => {
         console.error('Error verifying operador status:', error);
@@ -290,7 +293,7 @@ interface Documento {
     MatSelectModule,
     MatIconModule,
     MatDatepickerModule,
-    
+
   ],
   template: `
     <form [formGroup]="form" class="dialog-form" (ngSubmit)="onSubmit()">
@@ -359,12 +362,16 @@ interface Documento {
     <!-- DATOS DEL PROPIETARIO -->
     <section>
       <h3>Datos del propietario</h3>
+      <a [href]="'https://wa.me/' + f['telefonoPropietario'].value" target="_blank" mat-raised-button color="primary" style="margin-bottom: 18px;">
+        <img src="/assets/logos/whatsapp.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
+        Enviar mensaje por WhatsApp
+      </a>
       <div class="row">
         <mat-form-field appearance="fill">
-          <mat-label>Nombre de; propietario</mat-label>
+          <mat-label>Nombre del propietario</mat-label>
           <input matInput formControlName="nombrePropietario" [disabled]="!isAdmin">
           <mat-error *ngIf="f['nombrePropietario'].invalid && f['nombrePropietario'].touched">
-            Nombre de; propietario es obligatorio
+            Nombre del propietario es obligatorio
           </mat-error>
         </mat-form-field>
         <mat-form-field appearance="fill">
@@ -398,6 +405,10 @@ interface Documento {
     <!-- DATOS DEL GERENTE -->
     <section>
       <h3>Datos del gerente</h3>
+      <a [href]="'https://wa.me/' + f['telefonoGerente'].value" target="_blank" mat-raised-button color="primary" style="margin-bottom: 18px;">
+        <img src="/assets/logos/whatsapp.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
+        Enviar mensaje por WhatsApp
+      </a>
       <div class="row">
         <mat-form-field appearance="fill">
           <mat-label>Nombre del gerente</mat-label>
@@ -769,25 +780,25 @@ export class ComercioDialogComponent implements OnInit {
   }
 
   async verDocumento(doc: Documento) {
-  const url = `${environment.backendUrl}/documentos/${this.data.id}/${doc.key}`;
-  try {
-    const res = await fetch(url, { credentials: 'include' });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    const blob = await res.blob();
+    const url = `${environment.backendUrl}/documentos/${this.data.id}/${doc.key}`;
+    try {
+      const res = await fetch(url, { credentials: 'include' });
+      if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+      const blob = await res.blob();
 
-    const blobUrl = URL.createObjectURL(blob);
-    this.dialog.open(DocumentViewerDialogComponent, {
-      data: { blobUrl, label: doc.label, inline: doc.inline },
-      width: '50vw',        // antes 80vw
-      height: '90vh',       // antes 80vh
-      maxWidth: '95vw',
-      maxHeight: '95vh',
-      panelClass: 'document-viewer-dialog'
-    });
-  } catch (err) {
-    console.error('Fetch error:', err);
+      const blobUrl = URL.createObjectURL(blob);
+      this.dialog.open(DocumentViewerDialogComponent, {
+        data: { blobUrl, label: doc.label, inline: doc.inline },
+        width: '50vw',        // antes 80vw
+        height: '90vh',       // antes 80vh
+        maxWidth: '95vw',
+        maxHeight: '95vh',
+        panelClass: 'document-viewer-dialog'
+      });
+    } catch (err) {
+      console.error('Fetch error:', err);
+    }
   }
-}
 
 
   onSubmit() {

@@ -37,11 +37,14 @@ export class RestaurantesComponent {
 
   isAdmin = false;
   isOperador = false;
+  isReadonly = true;
   constructor(private appService: AppService, private dialog: MatDialog) {
 
     this.appService.verifyAdmin().subscribe({
       next: (response: any) => {
         this.isAdmin = response.role === 'admin';
+        this.isReadonly = !this.isAdmin;
+
 
         console.log(this.isAdmin);
       },
@@ -52,6 +55,8 @@ export class RestaurantesComponent {
     this.appService.verifyOperador().subscribe({
       next: (response: any) => {
         this.isOperador = response.success;
+        this.isReadonly = !this.isOperador;
+
       },
       error: (error: any) => {
         console.error('Error verifying operador status:', error);
@@ -358,6 +363,10 @@ interface Documento {
     <!-- DATOS DEL PROPIETARIO -->
     <section>
       <h3>Datos del propietario</h3>
+      <a [href]="'https://wa.me/' + f['telefonoPropietario'].value" target="_blank" mat-raised-button color="primary" style="margin-bottom: 18px;">
+        <img src="/assets/logos/whatsapp.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
+        Enviar mensaje por WhatsApp
+      </a>
       <div class="row">
         <mat-form-field appearance="fill">
           <mat-label>Nombre de; propietario</mat-label>
@@ -397,6 +406,10 @@ interface Documento {
     <!-- DATOS DEL GERENTE -->
     <section>
       <h3>Datos del gerente</h3>
+      <a [href]="'https://wa.me/' + f['telefonoGerente'].value" target="_blank" mat-raised-button color="primary" style="margin-bottom: 18px;">
+        <img src="/assets/logos/whatsapp.png" alt="" style="width: 20px; height: 20px;vertical-align: middle;">
+        Enviar mensaje por WhatsApp
+      </a>
       <div class="row">
         <mat-form-field appearance="fill">
           <mat-label>Nombre del gerente</mat-label>

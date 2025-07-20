@@ -22,7 +22,8 @@
             matTooltip="Ver fechas importantes">
             <mat-icon>calendar_month</mat-icon>
         </button>
-        <button mat-icon-button class="transparent-button" (click)="toggleNotifications()" matTooltip="Notificaciones">
+        <button mat-icon-button class="transparent-button" *ngIf="isOperador" (click)="toggleNotifications()"
+            matTooltip="Notificaciones">
             <mat-icon>notifications</mat-icon>
         </button>
 
